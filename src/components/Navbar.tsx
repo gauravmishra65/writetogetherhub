@@ -46,7 +46,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img
-              src="/WriteTogetherHub copy.png"
+              src="/WriteTogetherHub copy copy.png"
               alt="Write Together Hub"
               className="h-11 w-auto object-contain"
             />
