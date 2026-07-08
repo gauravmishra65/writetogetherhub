@@ -1,0 +1,277 @@
+import { Link } from 'react-router-dom';
+import {
+  BookOpen, MessageCircle, Star, Zap, FileText, Users, ArrowRight,
+  PenLine, CheckCircle, Heart, Shield, Award, Lightbulb, BookMarked,
+  Edit3, Feather, Target
+} from 'lucide-react';
+
+const features = [
+  { icon: BookOpen, title: 'Learn Writing Basics', desc: 'Step-by-step guides on grammar, story structure, character development, and the craft of writing.', link: '/start-here', color: 'bg-sky-50 text-sky-600' },
+  { icon: Edit3, title: 'Share Short Writing Pieces', desc: 'Post excerpts, first drafts, and work-in-progress pieces in a safe, welcoming space.', link: '/writer-forum', color: 'bg-sage-50 text-sage-600' },
+  { icon: MessageCircle, title: 'Get Kind Feedback', desc: 'Receive thoughtful, constructive feedback from fellow writers who genuinely want to help you improve.', link: '/feedback-corner', color: 'bg-ember-50 text-ember-600' },
+  { icon: Zap, title: 'Join Weekly Writing Challenges', desc: 'Fun, short prompts to keep your creative muscles active and your writing habit strong.', link: '/weekly-challenges', color: 'bg-parchment-100 text-parchment-700' },
+  { icon: BookMarked, title: 'Understand Publishing', desc: 'Learn self-publishing, traditional publishing, and how to avoid common scams in plain language.', link: '/publishing-help', color: 'bg-rose-50 text-rose-600' },
+  { icon: FileText, title: 'Download Free Templates', desc: 'Novel planners, character sheets, editing checklists, and launch guides — all free to download.', link: '/free-resources', color: 'bg-violet-50 text-violet-600' },
+  { icon: Users, title: 'Meet Other New Writers', desc: 'Connect with people who are on the same journey — beginners encouraging beginners.', link: '/writer-forum', color: 'bg-teal-50 text-teal-600' },
+];
+
+const journey = [
+  { step: 1, icon: Feather, title: 'Start Writing', desc: 'Begin with just 200 words a day. No experience required. The first sentence is the hardest — we help you write it.' },
+  { step: 2, icon: Edit3, title: 'Share an Excerpt', desc: 'Post a short piece in the forum. Your work stays yours. We share only excerpts, never full manuscripts.' },
+  { step: 3, icon: MessageCircle, title: 'Receive Kind Feedback', desc: 'Community members respond with what they liked, what confused them, and one gentle suggestion to improve.' },
+  { step: 4, icon: Target, title: 'Improve & Publish', desc: 'Refine your work with confidence, then explore self-publishing and traditional publishing paths with our free guides.' },
+];
+
+const promises = [
+  { icon: CheckCircle, text: 'Always free to join and participate' },
+  { icon: Heart, text: 'Respectful, kind feedback every time' },
+  { icon: Shield, text: 'Writers keep full ownership of their work' },
+  { icon: Award, text: 'Beginner-friendly learning at every level' },
+  { icon: Users, text: 'Supportive community, no judgment' },
+  { icon: Lightbulb, text: 'Practical publishing guidance' },
+];
+
+export default function Home() {
+  return (
+    <div>
+      {/* Hero */}
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-gradient-to-br from-parchment-50 via-white to-parchment-100">
+        {/* Decorative background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-parchment-200/40 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-ember-100/30 blur-3xl" />
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-sage-100/20 blur-2xl" />
+        </div>
+
+        <div className="section-container relative z-10 py-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-ember-50 text-ember-700 text-sm font-semibold px-4 py-2 rounded-full mb-6 border border-ember-100">
+                <PenLine className="w-4 h-4" />
+                Free Community for New Writers
+              </div>
+
+              <h1 className="font-serif text-5xl lg:text-6xl xl:text-7xl font-bold text-ink-900 leading-tight mb-6">
+                Write.{' '}
+                <span className="text-ember-600">Share.</span>{' '}
+                Learn.{' '}
+                <span className="text-sage-600">Publish.</span>{' '}
+                <em>Together.</em>
+              </h1>
+
+              <p className="text-ink-500 text-xl leading-relaxed mb-10 max-w-lg">
+                A free community where new writers learn, share their work, receive kind feedback, and understand publishing — without paying a single penny.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/join" className="btn-primary text-base px-8 py-4">
+                  Join Free Community
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link to="/start-here" className="btn-secondary text-base px-8 py-4">
+                  <BookOpen className="w-5 h-5" />
+                  Start Learning
+                </Link>
+              </div>
+
+              <div className="flex items-center gap-6 mt-10">
+                <div className="text-center">
+                  <p className="font-serif font-bold text-2xl text-ink-900">100%</p>
+                  <p className="text-xs text-ink-400 font-medium">Free Forever</p>
+                </div>
+                <div className="w-px h-10 bg-parchment-200" />
+                <div className="text-center">
+                  <p className="font-serif font-bold text-2xl text-ink-900">Kind</p>
+                  <p className="text-xs text-ink-400 font-medium">Feedback Only</p>
+                </div>
+                <div className="w-px h-10 bg-parchment-200" />
+                <div className="text-center">
+                  <p className="font-serif font-bold text-2xl text-ink-900">Yours</p>
+                  <p className="text-xs text-ink-400 font-medium">You Own Your Work</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero illustration */}
+            <div className="hidden lg:flex justify-center items-center">
+              <div className="relative">
+                <div className="w-[420px] h-[420px] bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-3xl flex items-center justify-center shadow-warm">
+                  <div className="grid grid-cols-2 gap-4 p-8">
+                    {[
+                      { icon: '✍️', label: 'Write Daily' },
+                      { icon: '📖', label: 'Read & Learn' },
+                      { icon: '💬', label: 'Get Feedback' },
+                      { icon: '📚', label: 'Get Published' },
+                    ].map((item, i) => (
+                      <div key={i} className="bg-white rounded-2xl p-6 shadow-soft flex flex-col items-center gap-3 text-center">
+                        <span className="text-4xl">{item.icon}</span>
+                        <span className="text-sm font-semibold text-ink-700">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute -top-4 -right-4 bg-ember-600 text-white rounded-2xl px-4 py-2 shadow-lg text-sm font-semibold">
+                  Beginner Friendly!
+                </div>
+                <div className="absolute -bottom-4 -left-4 bg-sage-600 text-white rounded-2xl px-4 py-2 shadow-lg text-sm font-semibold">
+                  Always Free!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Write Together Hub */}
+      <section className="section-padding bg-ink-900">
+        <div className="section-container">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="badge bg-ember-900/50 text-ember-300 mb-4">Our Purpose</div>
+              <h2 className="section-title text-white mb-6">Why Write Together Hub Exists</h2>
+              <p className="text-ink-300 text-lg leading-relaxed mb-6">
+                Many new writers feel lost. They want to write but do not know where to begin. They want to improve but cannot afford expensive courses. They want feedback but fear harsh criticism. They want to publish but find the process confusing and full of scams.
+              </p>
+              <p className="text-ink-300 text-lg leading-relaxed mb-8">
+                Write Together Hub was built to solve all of this — completely free. A safe, warm space where beginners encourage beginners, where growth is celebrated, and where every writer has a real chance to improve and publish.
+              </p>
+              <Link to="/about" className="btn-outline border-ember-500 text-ember-400 hover:bg-ember-600 hover:text-white hover:border-ember-600">
+                Read Our Full Story
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { q: 'Where do I start?', a: 'Our Start Here guide walks you through every first step.' },
+                { q: 'How do I improve?', a: 'Weekly challenges, feedback, and practical lessons.' },
+                { q: 'Will people judge me?', a: 'Never. Our community values kindness above all.' },
+                { q: 'How do I publish?', a: 'Free, plain-language publishing guides with no jargon.' },
+              ].map((item, i) => (
+                <div key={i} className="bg-ink-800 rounded-xl p-5 border border-ink-700">
+                  <p className="text-parchment-300 font-serif font-semibold text-sm mb-2">"{item.q}"</p>
+                  <p className="text-ink-400 text-sm leading-relaxed">{item.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What You Can Do */}
+      <section className="section-padding bg-white">
+        <div className="section-container">
+          <div className="text-center mb-14">
+            <div className="badge bg-parchment-100 text-parchment-700 mb-4">Everything You Need</div>
+            <h2 className="section-title">What You Can Do Here</h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              Every tool, guide, and community feature you need to grow as a writer — free, forever.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {features.map((feature) => (
+              <div key={feature.title} className="card p-6 flex flex-col">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${feature.color}`}>
+                  <feature.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-serif font-semibold text-ink-900 mb-2 text-lg leading-snug">{feature.title}</h3>
+                <p className="text-ink-500 text-sm leading-relaxed flex-1">{feature.desc}</p>
+                <Link
+                  to={feature.link}
+                  className="mt-4 inline-flex items-center gap-1.5 text-ember-600 hover:text-ember-700 text-sm font-semibold group"
+                >
+                  Explore
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Beginner Journey */}
+      <section className="section-padding bg-gradient-to-b from-parchment-50 to-white">
+        <div className="section-container">
+          <div className="text-center mb-14">
+            <div className="badge bg-sage-100 text-sage-700 mb-4">Your Path Forward</div>
+            <h2 className="section-title">The Beginner Writer Journey</h2>
+            <p className="section-subtitle max-w-xl mx-auto">
+              Four simple steps from your very first word to a finished, publishable piece.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {journey.map((item, i) => (
+              <div key={item.step} className="relative flex flex-col items-center text-center">
+                {i < journey.length - 1 && (
+                  <div className="hidden lg:block absolute top-8 left-1/2 w-full h-0.5 bg-parchment-200" />
+                )}
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-ember-600 flex items-center justify-center shadow-warm mb-5">
+                  <item.icon className="w-7 h-7 text-white" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-ink-900 text-white text-xs font-bold flex items-center justify-center">
+                    {item.step}
+                  </div>
+                </div>
+                <h3 className="font-serif font-semibold text-ink-900 text-xl mb-3">{item.title}</h3>
+                <p className="text-ink-500 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link to="/start-here" className="btn-primary px-8 py-4 text-base">
+              Begin Your Journey
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Promise */}
+      <section className="section-padding bg-parchment-100">
+        <div className="section-container">
+          <div className="text-center mb-14">
+            <div className="badge bg-white text-ink-600 mb-4 shadow-sm">Our Commitment</div>
+            <h2 className="section-title">The Write Together Hub Promise</h2>
+            <p className="section-subtitle max-w-xl mx-auto">
+              These are not just words. They are the values that every member of our community agrees to uphold.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {promises.map((item) => (
+              <div key={item.text} className="flex items-center gap-4 bg-white rounded-xl p-5 shadow-sm border border-parchment-100">
+                <div className="w-10 h-10 rounded-full bg-sage-100 flex items-center justify-center flex-shrink-0">
+                  <item.icon className="w-5 h-5 text-sage-600" />
+                </div>
+                <p className="font-medium text-ink-800">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="section-padding bg-gradient-to-br from-ember-600 to-ember-700 text-white relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-white/5 blur-2xl" />
+        </div>
+        <div className="section-container relative z-10 text-center">
+          <h2 className="font-serif text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+            Your writing journey does not<br className="hidden sm:block" /> have to begin alone.
+          </h2>
+          <p className="text-ember-100 text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
+            Join a free community built for new writers who want to learn, improve, and grow together. Your words deserve to be shared.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/join" className="inline-flex items-center justify-center gap-2 bg-white text-ember-700 hover:bg-parchment-50 font-bold px-10 py-4 rounded-lg text-lg shadow-lg transition-all duration-200 active:scale-95">
+              Join Write Together Hub for Free
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link to="/start-here" className="inline-flex items-center justify-center gap-2 border-2 border-white/40 text-white hover:bg-white/10 font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200">
+              <BookOpen className="w-5 h-5" />
+              Browse Resources
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

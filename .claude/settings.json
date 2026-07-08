@@ -1,0 +1,6 @@
+{
+  "env": {
+    "npm_config_prefer_offline": "true",
+    "npm_config_cache": "/tmp/.npm-cache"
+  }
+}
