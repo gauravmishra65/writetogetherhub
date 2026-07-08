@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PenLine, Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -44,15 +44,12 @@ export default function Navbar() {
       <div className="section-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-ember-600 rounded-lg flex items-center justify-center shadow-md group-hover:bg-ember-700 transition-colors">
-              <PenLine className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="font-serif font-bold text-ink-900 text-lg leading-tight block">
-                Write Together Hub
-              </span>
-            </div>
+          <Link to="/" className="flex items-center group">
+            <img
+              src="/WriteTogetherHub copy.png"
+              alt="Write Together Hub"
+              className="h-12 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Nav */}

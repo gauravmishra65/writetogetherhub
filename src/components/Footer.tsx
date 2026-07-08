@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PenLine, Twitter, Facebook, Instagram, Youtube, Mail, ArrowRight } from 'lucide-react';
+import { Twitter, Facebook, Instagram, Youtube, Mail, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -53,11 +53,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 py-16">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2.5 group mb-4">
-              <div className="w-9 h-9 bg-ember-600 rounded-lg flex items-center justify-center">
-                <PenLine className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-serif font-bold text-white text-lg">Write Together Hub</span>
+            <Link to="/" className="flex items-center group mb-4">
+              <img
+                src="/WriteTogetherHub copy.png"
+                alt="Write Together Hub"
+                className="h-14 w-auto object-contain brightness-0 invert"
+              />
             </Link>
             <p className="text-ink-300 text-sm leading-relaxed mb-5 italic font-serif">
               "Write. Share. Learn. Publish. Together."
