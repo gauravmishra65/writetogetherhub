@@ -13,7 +13,7 @@ export default function Layout() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1" style={{ paddingTop: '160px' }}>
+      <main className="flex-1" style={{ paddingTop: '72px' }}>
         <Outlet />
       </main>
       <Footer />
