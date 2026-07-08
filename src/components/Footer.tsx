@@ -57,7 +57,7 @@ export default function Footer() {
               <img
                 src="/WriteTogetherHub.png"
                 alt="Write Together Hub"
-                style={{ width: '880px', maxWidth: '100%', height: 'auto', display: 'block' }}
+                style={{ width: '660px', maxWidth: '100%', height: 'auto', display: 'block' }}
               />
             </Link>
             <p className="text-ink-300 text-sm leading-relaxed mb-5 italic font-serif">
