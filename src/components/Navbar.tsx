@@ -42,13 +42,13 @@ export default function Navbar() {
       }`}
     >
       <div className="section-container">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img
               src="/WriteTogetherHub copy copy.png"
               alt="Write Together Hub"
-              className="h-11 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
 
