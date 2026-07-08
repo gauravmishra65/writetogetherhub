@@ -48,7 +48,7 @@ export default function Navbar() {
             <img
               src="/WriteTogetherHub copy.png"
               alt="Write Together Hub"
-              className="h-8 w-auto object-contain"
+              className="h-11 w-auto object-contain"
             />
           </Link>
 
