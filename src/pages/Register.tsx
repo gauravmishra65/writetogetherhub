@@ -124,6 +124,26 @@ export default function Register() {
       }
       return;
     }
+    fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-new-joiner`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        source: 'registration',
+        name: form.name,
+        email: form.email,
+        phone: form.phone || null,
+        city: form.city || null,
+        country: form.country || null,
+        experience_level: form.experience_level || null,
+        writing_type: form.writing_type || null,
+        genres: form.genres.length > 0 ? form.genres : null,
+        bio: form.bio || null,
+        how_heard: form.how_heard || null,
+      }),
+    }).catch(() => {});
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

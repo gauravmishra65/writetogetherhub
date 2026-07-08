@@ -73,6 +73,22 @@ export default function JoinFree() {
       }
       return;
     }
+    fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-new-joiner`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        source: 'join_free',
+        name: form.name,
+        email: form.email,
+        experience_level: form.experience || null,
+        writing_type: form.type || null,
+        interests: form.interest.length > 0 ? form.interest : null,
+        message: form.message || null,
+      }),
+    }).catch(() => {});
     setSubmitted(true);
   };
 
