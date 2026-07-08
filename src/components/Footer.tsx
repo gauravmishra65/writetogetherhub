@@ -57,7 +57,7 @@ export default function Footer() {
               <img
                 src="/WriteTogetherHub copy.png"
                 alt="Write Together Hub"
-                className="h-14 w-auto object-contain brightness-0 invert"
+                className="h-8 w-auto object-contain brightness-0 invert"
               />
             </Link>
             <p className="text-ink-300 text-sm leading-relaxed mb-5 italic font-serif">
