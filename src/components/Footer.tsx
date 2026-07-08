@@ -55,9 +55,9 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center group mb-4">
               <img
-                src="/WriteTogetherHub copy copy.png"
+                src="/WriteTogetherHub.png"
                 alt="Write Together Hub"
-                className="w-[220px] max-w-full h-auto object-contain"
+                className="w-[220px] max-w-full h-auto object-contain brightness-0 invert"
               />
             </Link>
             <p className="text-ink-300 text-sm leading-relaxed mb-5 italic font-serif">

@@ -42,13 +42,13 @@ export default function Navbar() {
       }`}
     >
       <div className="section-container">
-        <div className="flex items-center justify-between py-2">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img
-              src="/WriteTogetherHub copy copy.png"
+              src="/WriteTogetherHub.png"
               alt="Write Together Hub"
-              style={{ height: '80px', width: 'auto', display: 'block' }}
+              className="h-11 w-auto object-contain"
             />
           </Link>
 
