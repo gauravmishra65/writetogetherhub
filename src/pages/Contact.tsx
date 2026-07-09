@@ -108,14 +108,16 @@ export default function Contact() {
                 <h3 className="font-serif font-bold text-ink-900 text-xl mb-4">Follow Us</h3>
                 <div className="flex flex-wrap gap-3">
                   {[
-                    { Icon: Twitter, label: 'Twitter', color: 'hover:bg-sky-600' },
-                    { Icon: Facebook, label: 'Facebook', color: 'hover:bg-blue-700' },
-                    { Icon: Instagram, label: 'Instagram', color: 'hover:bg-pink-600' },
-                    { Icon: Youtube, label: 'YouTube', color: 'hover:bg-red-600' },
-                  ].map(({ Icon, label, color }) => (
+                    { Icon: Twitter, label: 'Twitter', color: 'hover:bg-sky-600', href: 'https://twitter.com/writetogetherh' },
+                    { Icon: Facebook, label: 'Facebook', color: 'hover:bg-blue-700', href: 'https://www.facebook.com/profile.php?id=61591772941621' },
+                    { Icon: Instagram, label: 'Instagram', color: 'hover:bg-pink-600', href: '#' },
+                    { Icon: Youtube, label: 'YouTube', color: 'hover:bg-red-600', href: '#' },
+                  ].map(({ Icon, label, color, href }) => (
                     <a
                       key={label}
-                      href="#"
+                      href={href}
+                      target={href !== '#' ? '_blank' : undefined}
+                      rel={href !== '#' ? 'noopener noreferrer' : undefined}
                       className={`flex items-center gap-2 bg-parchment-100 ${color} text-ink-700 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
                     >
                       <Icon className="w-4 h-4" />

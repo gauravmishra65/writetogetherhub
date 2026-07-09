@@ -71,7 +71,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 mt-6">
               {[
                 { Icon: Twitter, href: 'https://twitter.com/writetogetherh', label: 'Twitter' },
-                { Icon: Facebook, href: '#', label: 'Facebook' },
+                { Icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61591772941621', label: 'Facebook' },
                 { Icon: Instagram, href: '#', label: 'Instagram' },
                 { Icon: Youtube, href: '#', label: 'YouTube' },
               ].map(({ Icon, href, label }) => (

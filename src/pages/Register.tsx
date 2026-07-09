@@ -68,10 +68,10 @@ const contactDetails = [
 ];
 
 const socials = [
-  { Icon: Twitter, label: 'Twitter / X' },
-  { Icon: Facebook, label: 'Facebook' },
-  { Icon: Instagram, label: 'Instagram' },
-  { Icon: Youtube, label: 'YouTube' },
+  { Icon: Twitter, label: 'Twitter / X', href: 'https://twitter.com/writetogetherh' },
+  { Icon: Facebook, label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61591772941621' },
+  { Icon: Instagram, label: 'Instagram', href: '#' },
+  { Icon: Youtube, label: 'YouTube', href: '#' },
 ];
 
 const emptyForm = {
@@ -448,10 +448,12 @@ export default function Register() {
               <div className="card p-6">
                 <h3 className="font-serif font-bold text-ink-900 text-lg mb-4">Follow Our Community</h3>
                 <div className="space-y-2">
-                  {socials.map(({ Icon, label }) => (
+                  {socials.map(({ Icon, label, href }) => (
                     <a
                       key={label}
-                      href="#"
+                      href={href}
+                      target={href !== '#' ? '_blank' : undefined}
+                      rel={href !== '#' ? 'noopener noreferrer' : undefined}
                       className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-parchment-50 hover:bg-parchment-100 text-ink-700 hover:text-ink-900 transition-colors text-sm font-medium"
                     >
                       <Icon className="w-4 h-4 text-ember-500" />
