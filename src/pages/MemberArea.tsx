@@ -86,12 +86,14 @@ export default function MemberArea() {
 
       setUserEmail(user.email ?? '');
 
-      // Try registrations first, then join_requests.
-      // RLS policy (lower(email) = lower(auth user email)) scopes results —
-      // no redundant client-side email filter needed.
+      // Emails in both tables are normalized to lowercase on insert (trigger).
+      // Auth also stores emails lowercase, so exact .eq() match is safe and reliable.
+      const email = user.email!.toLowerCase();
+
       const { data: reg, error: regErr } = await supabase
         .from('registrations')
         .select('name,email,city,country,experience_level,writing_type,genres,bio,status')
+        .eq('email', email)
         .maybeSingle();
 
       if (regErr) console.error('registrations query error:', regErr);
@@ -105,6 +107,7 @@ export default function MemberArea() {
       const { data: join, error: joinErr } = await supabase
         .from('join_requests')
         .select('name,email,experience_level,writing_type,interests,message,status')
+        .eq('email', email)
         .maybeSingle();
 
       if (joinErr) console.error('join_requests query error:', joinErr);
