@@ -116,8 +116,9 @@ export default function Register() {
     setError('');
 
     // Create Supabase auth account
+    const normalizedEmail = form.email.trim().toLowerCase();
     const { error: authErr } = await supabase.auth.signUp({
-      email: form.email,
+      email: normalizedEmail,
       password: form.password,
     });
     if (authErr && authErr.message !== 'User already registered') {
@@ -128,7 +129,7 @@ export default function Register() {
 
     const { error: err } = await supabase.from('registrations').insert({
       name: form.name,
-      email: form.email,
+      email: normalizedEmail,
       phone: form.phone || null,
       city: form.city || null,
       country: form.country || null,
@@ -156,7 +157,7 @@ export default function Register() {
       body: JSON.stringify({
         source: 'registration',
         name: form.name,
-        email: form.email,
+        email: normalizedEmail,
         phone: form.phone || null,
         city: form.city || null,
         country: form.country || null,

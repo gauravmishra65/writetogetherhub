@@ -80,7 +80,7 @@ export default function MemberArea() {
       const { data: reg } = await supabase
         .from('registrations')
         .select('name,email,city,country,experience_level,writing_type,genres,bio,status')
-        .eq('email', user.email!)
+        .ilike('email', user.email!)
         .maybeSingle();
 
       if (reg) {
@@ -92,7 +92,7 @@ export default function MemberArea() {
       const { data: join } = await supabase
         .from('join_requests')
         .select('name,email,experience_level,writing_type,interests,message,status')
-        .eq('email', user.email!)
+        .ilike('email', user.email!)
         .maybeSingle();
 
       if (join) {
