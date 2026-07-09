@@ -97,7 +97,7 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         from: "Write Together Hub <onboarding@resend.dev>",
-        to: ["gaurav.mishra65@gmail.com"],
+        to: ["hello@writetogetherhub.com"],
         subject,
         html,
       }),
