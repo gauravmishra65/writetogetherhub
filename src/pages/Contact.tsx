@@ -34,6 +34,9 @@ export default function Contact() {
       setFormError('Something went wrong. Please try again.');
       return;
     }
+    supabase.functions.invoke('notify-new-joiner', {
+      body: { source: 'contact_message', name: form.name, email: form.email, subject: form.subject, message: form.message },
+    });
     setSubmitted(true);
   };
 

@@ -63,6 +63,9 @@ export default function FeedbackCorner() {
       setSubmitError('Something went wrong. Please try again.');
       return;
     }
+    supabase.functions.invoke('notify-new-joiner', {
+      body: { source: 'feedback_submission', author_name: form.author_name, title: form.title, genre: form.genre, word_count: form.word_count || null, feedback_type: form.feedback_type, excerpt: form.excerpt },
+    });
     setSubmitSuccess(true);
     setForm(submitInitial);
     fetchSubmissions();

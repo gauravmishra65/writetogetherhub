@@ -128,6 +128,9 @@ export default function WeeklyChallenges() {
       setError('Something went wrong. Please try again.');
       return;
     }
+    supabase.functions.invoke('notify-new-joiner', {
+      body: { source: 'challenge_entry', author_name: form.author_name, challenge_title: activeChallenge, entry_text: form.entry_text },
+    });
     setSuccess(true);
   };
 

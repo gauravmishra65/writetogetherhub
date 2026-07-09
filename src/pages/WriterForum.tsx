@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MessageSquare, Users, BookOpen, Star, Zap, HelpCircle, ArrowRight, TrendingUp, Loader2 } from 'lucide-react';
+import { MessageSquare, Users, BookOpen, Star, Zap, HelpCircle, ArrowRight, TrendingUp, Loader2, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase, type ForumDiscussion } from '../lib/supabase';
 
@@ -76,6 +76,11 @@ function timeAgo(dateStr: string): string {
 export default function WriterForum() {
   const [discussions, setDiscussions] = useState<ForumDiscussion[]>([]);
   const [loadingDiscussions, setLoadingDiscussions] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ author_name: '', category: '', title: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState(false);
 
   useEffect(() => {
     async function fetchDiscussions() {
@@ -89,6 +94,35 @@ export default function WriterForum() {
     }
     fetchDiscussions();
   }, []);
+
+  async function handleStartDiscussion(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setFormError('');
+    const { error } = await supabase.from('forum_discussions').insert({
+      category: form.category,
+      title: form.title,
+      author_name: form.author_name,
+    });
+    setSubmitting(false);
+    if (error) {
+      setFormError('Something went wrong. Please try again.');
+      return;
+    }
+    supabase.functions.invoke('notify-new-joiner', {
+      body: { source: 'forum_discussion', author_name: form.author_name, category: form.category, title: form.title },
+    });
+    setFormSuccess(true);
+    const { data } = await supabase.from('forum_discussions').select('*').order('created_at', { ascending: false }).limit(10);
+    if (data) setDiscussions(data);
+  }
+
+  function closeModal() {
+    setShowForm(false);
+    setFormSuccess(false);
+    setForm({ author_name: '', category: '', title: '' });
+    setFormError('');
+  }
 
   return (
     <div>
@@ -107,9 +141,12 @@ export default function WriterForum() {
               Ask questions, share work, give encouragement, and connect with other new writers from around the world. A friendly community awaits.
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-8">
-              <Link to="/join" className="btn-primary">
-                Join to Participate
+              <button onClick={() => setShowForm(true)} className="btn-primary">
+                Start a Discussion
                 <ArrowRight className="w-4 h-4" />
+              </button>
+              <Link to="/join" className="btn-secondary">
+                Join the Community
               </Link>
               <Link to="/community-rules" className="btn-secondary">
                 Community Rules
@@ -171,7 +208,13 @@ export default function WriterForum() {
               <h2 className="section-title">Recent Discussions</h2>
               <p className="section-subtitle mt-2">The latest conversations happening in the community.</p>
             </div>
-            <TrendingUp className="w-6 h-6 text-ember-400 hidden md:block" />
+            <div className="flex items-center gap-3">
+              <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2.5 hidden md:flex">
+                Start a Discussion
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <TrendingUp className="w-6 h-6 text-ember-400 hidden md:block" />
+            </div>
           </div>
 
           {loadingDiscussions ? (
@@ -229,6 +272,63 @@ export default function WriterForum() {
           </div>
         </div>
       </section>
+
+      {/* Start a Discussion Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+            <div className="flex items-center justify-between p-6 border-b border-parchment-100">
+              <div>
+                <p className="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-0.5">Writer Forum</p>
+                <h3 className="font-serif font-bold text-ink-900 text-lg">Start a Discussion</h3>
+              </div>
+              <button onClick={closeModal} className="w-8 h-8 rounded-full bg-parchment-100 hover:bg-parchment-200 flex items-center justify-center transition-colors">
+                <X className="w-4 h-4 text-ink-600" />
+              </button>
+            </div>
+            <div className="p-6">
+              {formSuccess ? (
+                <div className="text-center py-6">
+                  <div className="w-14 h-14 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-7 h-7 text-sage-600" />
+                  </div>
+                  <h4 className="font-serif font-bold text-xl text-ink-900 mb-2">Discussion Started!</h4>
+                  <p className="text-ink-500 text-sm mb-5">Your thread is now live in the forum.</p>
+                  <button onClick={closeModal} className="btn-primary text-sm py-2.5 px-6">Done</button>
+                </div>
+              ) : (
+                <form onSubmit={handleStartDiscussion} className="space-y-5">
+                  {formError && (
+                    <div className="flex items-center gap-2 text-red-700 bg-red-50 border border-red-100 rounded-lg p-3 text-sm">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {formError}
+                    </div>
+                  )}
+                  <div>
+                    <label className="form-label">Your Name / Pen Name <span className="text-red-400">*</span></label>
+                    <input type="text" className="form-input" placeholder="How to credit you" value={form.author_name} onChange={e => setForm(f => ({ ...f, author_name: e.target.value }))} required />
+                  </div>
+                  <div>
+                    <label className="form-label">Category <span className="text-red-400">*</span></label>
+                    <select className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} required>
+                      <option value="">Select a category...</option>
+                      {categories.map(c => <option key={c.title} value={c.title}>{c.title}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Discussion Title <span className="text-red-400">*</span></label>
+                    <input type="text" className="form-input" placeholder="What would you like to discuss?" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+                  </div>
+                  <button type="submit" disabled={submitting} className="btn-primary w-full py-3 disabled:opacity-60">
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    {submitting ? 'Posting...' : 'Post Discussion'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
