@@ -1,5 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
 
+/**
+ * Checks a password against the HaveIBeenPwned Passwords API using k-anonymity.
+ * Only the first 5 hex chars of the SHA-1 hash are sent; no plain-text password leaves the browser.
+ * Returns true if the password appears in a known data breach.
+ */
+export async function checkPasswordBreached(password: string): Promise<boolean> {
+  try {
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
+    const hashHex = Array.from(new Uint8Array(hashBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase();
+    const prefix = hashHex.slice(0, 5);
+    const suffix = hashHex.slice(5);
+    const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
+      headers: { 'Add-Padding': 'true' },
+    });
+    if (!response.ok) return false; // fail open — don't block on API errors
+    const text = await response.text();
+    return text.split('\n').some(line => line.split(':')[0] === suffix);
+  } catch {
+    return false; // fail open on network/crypto errors
+  }
+}
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 

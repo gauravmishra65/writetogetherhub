@@ -5,7 +5,7 @@ import {
   CheckCircle, AlertCircle, ArrowRight, Clock, Globe,
   Twitter, Facebook, Instagram, Youtube, Loader2, Lock, Eye, EyeOff,
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, checkPasswordBreached } from '../lib/supabase';
 
 const experienceLevels = [
   'Complete Beginner — I have never really written before',
@@ -95,7 +95,7 @@ export default function Register() {
       genres: f.genres.includes(g) ? f.genres.filter(x => x !== g) : [...f.genres, g],
     }));
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password.length < 8) {
       setError('Password must be at least 8 characters.');
@@ -105,7 +105,14 @@ export default function Register() {
       setError('Passwords do not match.');
       return;
     }
+    setLoading(true);
     setError('');
+    const breached = await checkPasswordBreached(form.password);
+    setLoading(false);
+    if (breached) {
+      setError('This password has appeared in a known data breach. Please choose a different password.');
+      return;
+    }
     setStep(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -376,9 +383,11 @@ export default function Register() {
                   </div>
 
                   <div className="pt-2 flex justify-end">
-                    <button type="submit" className="btn-primary px-10">
-                      Continue to Writing Profile
-                      <ArrowRight className="w-4 h-4" />
+                    <button type="submit" disabled={loading} className="btn-primary px-10 disabled:opacity-60">
+                      {loading
+                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Checking...</>
+                        : <>Continue to Writing Profile <ArrowRight className="w-4 h-4" /></>
+                      }
                     </button>
                   </div>
                 </form>
