@@ -17,6 +17,8 @@ export type ContactMessage = {
   email: string;
   subject: string;
   message: string;
+  status: string;
+  admin_notes: string | null;
   created_at: string;
 };
 
@@ -28,6 +30,8 @@ export type JoinRequest = {
   writing_type: string | null;
   interests: string[] | null;
   message: string | null;
+  status: string;
+  admin_notes: string | null;
   created_at: string;
 };
 
@@ -38,6 +42,8 @@ export type ForumDiscussion = {
   author_name: string;
   replies: number;
   is_hot: boolean;
+  status: string;
+  admin_notes: string | null;
   created_at: string;
 };
 
@@ -50,6 +56,8 @@ export type FeedbackSubmission = {
   excerpt: string;
   author_name: string;
   response_count: number;
+  status: string;
+  admin_notes: string | null;
   created_at: string;
 };
 
@@ -65,6 +73,8 @@ export type Registration = {
   genres: string[] | null;
   bio: string | null;
   how_heard: string | null;
+  status: string;
+  admin_notes: string | null;
   created_at: string;
 };
 
@@ -73,5 +83,7 @@ export type ChallengeEntry = {
   challenge_title: string;
   entry_text: string;
   author_name: string;
+  status: string;
+  admin_notes: string | null;
   created_at: string;
 };

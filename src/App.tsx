@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import AdminRoute from './components/AdminRoute';
 import Home from './pages/Home';
 import About from './pages/About';
 import StartHere from './pages/StartHere';
@@ -12,6 +13,8 @@ import CommunityRules from './pages/CommunityRules';
 import JoinFree from './pages/JoinFree';
 import Contact from './pages/Contact';
 import Register from './pages/Register';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 export default function App() {
   return (
@@ -31,6 +34,15 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/register" element={<Register />} />
         </Route>
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
