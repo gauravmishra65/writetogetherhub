@@ -86,12 +86,15 @@ export default function MemberArea() {
 
       setUserEmail(user.email ?? '');
 
-      // Try registrations first, then join_requests
-      const { data: reg } = await supabase
+      // Try registrations first, then join_requests.
+      // RLS policy (lower(email) = lower(auth user email)) scopes results —
+      // no redundant client-side email filter needed.
+      const { data: reg, error: regErr } = await supabase
         .from('registrations')
         .select('name,email,city,country,experience_level,writing_type,genres,bio,status')
-        .ilike('email', user.email!)
         .maybeSingle();
+
+      if (regErr) console.error('registrations query error:', regErr);
 
       if (reg) {
         setProfile({ ...reg, source: 'registrations' });
@@ -99,11 +102,12 @@ export default function MemberArea() {
         return;
       }
 
-      const { data: join } = await supabase
+      const { data: join, error: joinErr } = await supabase
         .from('join_requests')
         .select('name,email,experience_level,writing_type,interests,message,status')
-        .ilike('email', user.email!)
         .maybeSingle();
+
+      if (joinErr) console.error('join_requests query error:', joinErr);
 
       if (join) {
         setProfile({ ...join, source: 'join_requests' });
