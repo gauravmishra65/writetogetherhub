@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Twitter, Facebook, Instagram, Youtube, Mail, ArrowRight } from 'lucide-react';
+import { Twitter, Facebook, Instagram, Youtube, Mail, ArrowRight, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -53,14 +53,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 py-16">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center group mb-4">
-              <img
-                src="/WriteTogetherHub.png"
-                alt="Write Together Hub"
-                style={{ width: '660px', maxWidth: '100%', height: 'auto', display: 'block' }}
-              />
+            <Link to="/" className="inline-flex items-center gap-3 group mb-4">
+              <div className="w-10 h-10 rounded-xl bg-ember-600 flex items-center justify-center flex-shrink-0 group-hover:bg-ember-500 transition-colors">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-serif font-bold text-white text-xl leading-tight">Write Together Hub</p>
+                <p className="text-ember-400 text-xs font-medium tracking-wide">writetogetherhub.com</p>
+              </div>
             </Link>
-            <p className="text-ink-300 text-sm leading-relaxed mb-5 italic font-serif">
+            <p className="text-parchment-300 text-sm leading-relaxed mb-2 italic font-serif">
               "Write. Share. Learn. Publish. Together."
             </p>
             <p className="text-ink-400 text-sm leading-relaxed">

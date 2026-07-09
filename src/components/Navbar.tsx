@@ -10,7 +10,7 @@ const navLinks = [
   { label: 'Feedback Corner', path: '/feedback-corner' },
   { label: 'Publishing Help', path: '/publishing-help' },
   { label: 'Free Resources', path: '/free-resources' },
-  { label: 'Challenges', path: '/weekly-challenges' },
+  { label: 'Weekly Challenges', path: '/weekly-challenges' },
   { label: 'Community Rules', path: '/community-rules' },
   { label: 'Contact', path: '/contact' },
 ];

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {
   BookOpen, MessageCircle, Star, Zap, FileText, Users, ArrowRight,
   PenLine, CheckCircle, Heart, Shield, Award, Lightbulb, BookMarked,
-  Edit3, Feather, Target
+  Edit3, Feather, Target, MousePointerClick, Share2, ThumbsUp, Clock, Lock
 } from 'lucide-react';
 
 const features = [
@@ -241,6 +241,103 @@ export default function Home() {
                   <item.icon className="w-5 h-5 text-sage-600" />
                 </div>
                 <p className="font-medium text-ink-800">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Start Your First Writing Step */}
+      <section className="section-padding bg-white">
+        <div className="section-container">
+          <div className="text-center mb-12">
+            <div className="badge bg-ember-50 text-ember-700 mb-4">New Here?</div>
+            <h2 className="section-title">Start Your First Writing Step Today</h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              New to writing? Begin with one simple prompt, share a short piece, and get kind feedback from other writers.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-6 mb-10">
+            {[
+              { icon: MousePointerClick, step: '1', title: 'Pick a Prompt', text: 'Choose a simple writing idea and write for 10–15 minutes.', color: 'bg-ember-50 text-ember-600' },
+              { icon: Share2, step: '2', title: 'Share a Short Piece', text: 'Post a paragraph, poem, scene, or idea inside the community.', color: 'bg-sage-50 text-sage-600' },
+              { icon: ThumbsUp, step: '3', title: 'Get Kind Feedback', text: 'Receive helpful comments using our friendly feedback method.', color: 'bg-sky-50 text-sky-600' },
+            ].map((card) => (
+              <div key={card.title} className="card p-8 flex flex-col items-center text-center relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-ink-900 text-white text-xs font-bold flex items-center justify-center shadow">
+                  {card.step}
+                </div>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 mt-2 ${card.color}`}>
+                  <card.icon className="w-7 h-7" />
+                </div>
+                <h3 className="font-serif font-semibold text-ink-900 text-xl mb-3">{card.title}</h3>
+                <p className="text-ink-500 text-sm leading-relaxed">{card.text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link to="/weekly-challenges" className="btn-primary px-8 py-4 text-base">
+              Try Today's Writing Prompt
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Today's Writing Prompt */}
+      <section className="section-padding bg-gradient-to-br from-parchment-50 via-white to-parchment-100">
+        <div className="section-container">
+          <div className="text-center mb-10">
+            <div className="badge bg-parchment-200 text-parchment-800 mb-4">Daily Inspiration</div>
+            <h2 className="section-title">Today's Writing Prompt</h2>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <div className="relative bg-white rounded-3xl shadow-warm border border-parchment-200 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-ember-500 via-ember-400 to-parchment-400" />
+              <div className="p-8 sm:p-10">
+                <div className="flex items-center gap-2 mb-5">
+                  <Feather className="w-5 h-5 text-ember-500" />
+                  <span className="text-ember-600 font-semibold text-sm uppercase tracking-wide">Featured Prompt</span>
+                </div>
+                <h3 className="font-serif font-bold text-ink-900 text-2xl sm:text-3xl mb-4 leading-snug">
+                  The Door That Was Never Opened
+                </h3>
+                <p className="text-ink-600 text-base leading-relaxed mb-6">
+                  Write 150–300 words about a character who finds a door in their home that they have never noticed before. What is behind it?
+                </p>
+                <div className="flex items-center gap-2 mb-8 text-ink-400 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>10–15 minutes</span>
+                </div>
+                <Link to="/weekly-challenges" className="btn-primary px-8 py-3.5 text-base inline-flex">
+                  Start Writing
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Writers Feel Safe Here */}
+      <section className="section-padding bg-ink-900">
+        <div className="section-container">
+          <div className="text-center mb-10">
+            <div className="badge bg-ink-800 text-parchment-300 mb-4">Community Values</div>
+            <h2 className="section-title text-white">Why Writers Feel Safe Here</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
+            {[
+              { icon: Heart, title: 'Free forever for beginner writers', color: 'bg-ember-900/50 text-ember-400' },
+              { icon: ThumbsUp, title: 'Kind feedback only', color: 'bg-sage-900/50 text-sage-400' },
+              { icon: Lock, title: 'Writers keep ownership of their work', color: 'bg-sky-900/50 text-sky-400' },
+              { icon: Shield, title: 'No plagiarism or copying allowed', color: 'bg-parchment-900/50 text-parchment-300' },
+            ].map((item) => (
+              <div key={item.title} className="flex flex-col items-center text-center bg-ink-800 rounded-2xl p-6 border border-ink-700">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <p className="text-parchment-200 font-medium text-sm leading-snug">{item.title}</p>
               </div>
             ))}
           </div>
