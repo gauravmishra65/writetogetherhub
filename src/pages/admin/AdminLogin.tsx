@@ -16,13 +16,29 @@ export default function AdminLogin() {
     setLoading(true);
     setError('');
 
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-    setLoading(false);
     if (authError) {
+      setLoading(false);
       setError('Invalid email or password. Please try again.');
       return;
     }
+
+    // Verify this user is in the admins table
+    const { data: adminRow } = await supabase
+      .from('admins')
+      .select('user_id')
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
+
+    setLoading(false);
+
+    if (!adminRow) {
+      await supabase.auth.signOut();
+      setError('Your account does not have admin access. Contact the site owner.');
+      return;
+    }
+
     navigate('/admin');
   };
 

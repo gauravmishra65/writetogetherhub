@@ -5,18 +5,41 @@ import { RefreshCw } from 'lucide-react';
 
 export default function AdminRoute({ children }: { children: React.ReactNode }) {
   const [checking, setChecking] = useState(true);
-  const [authed, setAuthed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setAuthed(!!data.session);
-      setChecking(false);
-    });
+    let cancelled = false;
+
+    async function check() {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        if (!cancelled) { setIsAdmin(false); setChecking(false); }
+        return;
+      }
+      const { data: adminRow } = await supabase
+        .from('admins')
+        .select('user_id')
+        .eq('user_id', sessionData.session.user.id)
+        .maybeSingle();
+      if (!cancelled) {
+        setIsAdmin(!!adminRow);
+        setChecking(false);
+      }
+    }
+
+    check();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuthed(!!session);
+      if (!session) {
+        setIsAdmin(false);
+        setChecking(false);
+      }
     });
-    return () => listener.subscription.unsubscribe();
+
+    return () => {
+      cancelled = true;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   if (checking) {
@@ -27,5 +50,5 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
     );
   }
 
-  return authed ? <>{children}</> : <Navigate to="/admin/login" replace />;
+  return isAdmin ? <>{children}</> : <Navigate to="/admin/login" replace />;
 }
