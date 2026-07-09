@@ -6,6 +6,7 @@ import About from './pages/About';
 import StartHere from './pages/StartHere';
 import WriterForum from './pages/WriterForum';
 import FeedbackCorner from './pages/FeedbackCorner';
+import FeedbackDetail from './pages/FeedbackDetail';
 import PublishingHelp from './pages/PublishingHelp';
 import FreeResources from './pages/FreeResources';
 import WeeklyChallenges from './pages/WeeklyChallenges';
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/start-here" element={<StartHere />} />
           <Route path="/writer-forum" element={<WriterForum />} />
           <Route path="/feedback-corner" element={<FeedbackCorner />} />
+          <Route path="/feedback-corner/:id" element={<FeedbackDetail />} />
           <Route path="/publishing-help" element={<PublishingHelp />} />
           <Route path="/free-resources" element={<FreeResources />} />
           <Route path="/weekly-challenges" element={<WeeklyChallenges />} />

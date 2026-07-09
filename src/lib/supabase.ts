@@ -78,6 +78,19 @@ export type Registration = {
   created_at: string;
 };
 
+export type FeedbackReply = {
+  id: string;
+  submission_id: string;
+  author_name: string;
+  liked: string;
+  confused: string;
+  suggestion: string;
+  encouragement: string;
+  status: string;
+  admin_notes: string | null;
+  created_at: string;
+};
+
 export type ChallengeEntry = {
   id: string;
   challenge_title: string;

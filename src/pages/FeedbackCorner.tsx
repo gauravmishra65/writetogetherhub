@@ -236,9 +236,18 @@ export default function FeedbackCorner() {
                   <p className="text-xs text-ink-400 mb-2">by {s.author_name}</p>
                   <p className="text-xs text-ink-500 mb-3">Seeking: {s.feedback_type}</p>
                   <p className="text-ink-600 text-sm leading-relaxed italic line-clamp-3 font-serif">{s.excerpt}</p>
-                  <div className="mt-4 flex items-center gap-1 text-xs text-ink-400">
-                    <MessageCircle className="w-3.5 h-3.5" />
-                    {s.response_count} response{s.response_count !== 1 ? 's' : ''}
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-xs text-ink-400">
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      {s.response_count} response{s.response_count !== 1 ? 's' : ''}
+                    </div>
+                    <Link
+                      to={`/feedback-corner/${s.id}`}
+                      className="text-xs font-semibold text-ember-600 hover:text-ember-700 flex items-center gap-1 transition-colors"
+                    >
+                      View & Reply
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
                   </div>
                 </div>
               ))}

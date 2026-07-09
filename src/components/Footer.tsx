@@ -176,6 +176,9 @@ export default function Footer() {
               <Link to="/join" className="text-ink-500 hover:text-parchment-300 text-xs transition-colors">
                 Join Free
               </Link>
+              <Link to="/admin/login" className="text-ink-600 hover:text-parchment-300 text-xs transition-colors">
+                Admin
+              </Link>
             </div>
           </div>
         </div>
