@@ -15,6 +15,7 @@ import Contact from './pages/Contact';
 import Register from './pages/Register';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminApprovals from './pages/admin/AdminApprovals';
 
 export default function App() {
   return (
@@ -40,6 +41,14 @@ export default function App() {
           element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/approvals"
+          element={
+            <AdminRoute>
+              <AdminApprovals />
             </AdminRoute>
           }
         />

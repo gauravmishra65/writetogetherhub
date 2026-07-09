@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  BookOpen, LogOut, Users, MessageSquare, FileText,
+  Users, MessageSquare, FileText,
   Trophy, BookMarked, Mail, CheckCircle, XCircle,
   Flag, Clock, ChevronDown, ChevronUp, Save, RefreshCw,
   BarChart3,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import AdminHeader from '../../components/AdminHeader';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
 
@@ -241,36 +242,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-parchment-50">
-      {/* Top bar */}
-      <header className="bg-ink-900 text-white sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-ember-600 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p className="font-serif font-bold text-white text-sm leading-tight">Write Together Hub</p>
-              <p className="text-ink-400 text-xs">Admin Panel</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {totalPending > 0 && (
-              <span className="hidden sm:flex items-center gap-1 text-amber-400 text-xs font-medium">
-                <Clock className="w-3.5 h-3.5" />
-                {totalPending} pending
-              </span>
-            )}
-            <span className="hidden sm:block text-ink-400 text-xs">{adminEmail}</span>
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-1.5 text-ink-400 hover:text-white text-sm transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:block">Sign out</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader
+        adminEmail={adminEmail}
+        totalPending={totalPending}
+        onSignOut={handleSignOut}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {/* Stats row */}
