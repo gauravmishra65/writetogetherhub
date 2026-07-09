@@ -47,7 +47,7 @@ const contactDetails = [
   {
     icon: Mail,
     label: 'Community & Safety',
-    value: 'safety@writetogetherhub.com',
+    value: 'hello@writetogetherhub.com',
     sub: 'For abuse reports or urgent issues',
     color: 'bg-rose-100 text-rose-600',
   },

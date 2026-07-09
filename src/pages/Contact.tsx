@@ -95,7 +95,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <p className="font-medium text-ink-800 text-sm">Community Reports</p>
-                      <p className="text-ink-500 text-sm">safety@writetogetherhub.com</p>
+                      <p className="text-ink-500 text-sm">hello@writetogetherhub.com</p>
                     </div>
                   </div>
                 </div>
