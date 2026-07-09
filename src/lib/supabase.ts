@@ -5,6 +5,13 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export type AdminStatus = 'pending' | 'approved' | 'rejected' | 'flagged';
+
+export type Admin = {
+  user_id: string;
+  created_at: string;
+};
+
 export type NewsletterSubscriber = {
   id: string;
   email: string;
@@ -17,7 +24,7 @@ export type ContactMessage = {
   email: string;
   subject: string;
   message: string;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
@@ -30,7 +37,7 @@ export type JoinRequest = {
   writing_type: string | null;
   interests: string[] | null;
   message: string | null;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
@@ -42,7 +49,7 @@ export type ForumDiscussion = {
   author_name: string;
   replies: number;
   is_hot: boolean;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
@@ -56,7 +63,7 @@ export type FeedbackSubmission = {
   excerpt: string;
   author_name: string;
   response_count: number;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
@@ -73,7 +80,7 @@ export type Registration = {
   genres: string[] | null;
   bio: string | null;
   how_heard: string | null;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
@@ -86,7 +93,7 @@ export type FeedbackReply = {
   confused: string;
   suggestion: string;
   encouragement: string;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
@@ -96,7 +103,7 @@ export type ChallengeEntry = {
   challenge_title: string;
   entry_text: string;
   author_name: string;
-  status: string;
+  status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
