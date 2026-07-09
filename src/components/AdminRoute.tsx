@@ -10,35 +10,47 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     let cancelled = false;
 
-    async function check() {
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        if (!cancelled) { setIsAdmin(false); setChecking(false); }
-        return;
-      }
-      const { data: adminRow } = await supabase
+    async function verifyAdmin(userId: string): Promise<boolean> {
+      const { data } = await supabase
         .from('admins')
         .select('user_id')
-        .eq('user_id', sessionData.session.user.id)
+        .eq('user_id', userId)
         .maybeSingle();
-      if (!cancelled) {
-        setIsAdmin(!!adminRow);
-        setChecking(false);
+      return !!data;
+    }
+
+    async function check() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          if (!cancelled) { setIsAdmin(false); setChecking(false); }
+          return;
+        }
+        const admin = await verifyAdmin(session.user.id);
+        if (!cancelled) { setIsAdmin(admin); setChecking(false); }
+      } catch {
+        if (!cancelled) { setIsAdmin(false); setChecking(false); }
       }
     }
 
     check();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
-        setIsAdmin(false);
-        setChecking(false);
+        if (!cancelled) { setIsAdmin(false); setChecking(false); }
+        return;
       }
+      // Re-verify on any session change (covers SIGNED_IN after navigate)
+      verifyAdmin(session.user.id).then((admin) => {
+        if (!cancelled) { setIsAdmin(admin); setChecking(false); }
+      }).catch(() => {
+        if (!cancelled) { setIsAdmin(false); setChecking(false); }
+      });
     });
 
     return () => {
       cancelled = true;
-      listener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 

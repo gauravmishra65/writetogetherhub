@@ -25,13 +25,19 @@ export default function AdminLogin() {
     }
 
     // Verify this user is in the admins table
-    const { data: adminRow } = await supabase
+    const { data: adminRow, error: adminError } = await supabase
       .from('admins')
       .select('user_id')
       .eq('user_id', authData.user.id)
       .maybeSingle();
 
     setLoading(false);
+
+    if (adminError) {
+      await supabase.auth.signOut();
+      setError('Could not verify admin access. Please try again.');
+      return;
+    }
 
     if (!adminRow) {
       await supabase.auth.signOut();
