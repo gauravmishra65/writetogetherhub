@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   BookOpen, Edit3, MessageCircle, Trophy, FileText, Users,
   LogOut, Clock, CheckCircle, XCircle, Flag, Feather,
-  ArrowRight, Mail, MapPin, Pen,
+  ArrowRight, Mail, MapPin, Pen, KeyRound, Eye, EyeOff,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -69,6 +69,16 @@ export default function MemberArea() {
   const [userEmail, setUserEmail] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // Password change state
+  const [showPwForm, setShowPwForm] = useState(false);
+  const [pwNew, setPwNew] = useState('');
+  const [pwConfirm, setPwConfirm] = useState('');
+  const [showPwNew, setShowPwNew] = useState(false);
+  const [showPwConfirm, setShowPwConfirm] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState('');
+  const [pwSuccess, setPwSuccess] = useState(false);
+
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -107,6 +117,21 @@ export default function MemberArea() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError('');
+    if (pwNew.length < 8) { setPwError('Password must be at least 8 characters.'); return; }
+    if (pwNew !== pwConfirm) { setPwError('Passwords do not match.'); return; }
+    setPwLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: pwNew });
+    setPwLoading(false);
+    if (error) { setPwError(error.message); return; }
+    setPwSuccess(true);
+    setPwNew('');
+    setPwConfirm('');
+    setTimeout(() => { setPwSuccess(false); setShowPwForm(false); }, 3000);
   };
 
   if (loading) {
@@ -163,15 +188,111 @@ export default function MemberArea() {
               )}
             </div>
 
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-2 text-sm text-ink-500 hover:text-red-600 border border-parchment-200 hover:border-red-200 px-4 py-2 rounded-lg transition-all self-start"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </button>
+            <div className="flex items-center gap-2 self-start flex-wrap">
+              <button
+                onClick={() => { setShowPwForm(v => !v); setPwError(''); setPwSuccess(false); }}
+                className="flex items-center gap-2 text-sm text-ink-500 hover:text-ember-600 border border-parchment-200 hover:border-ember-200 px-4 py-2 rounded-lg transition-all"
+              >
+                <KeyRound className="w-4 h-4" />
+                Change Password
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-2 text-sm text-ink-500 hover:text-red-600 border border-parchment-200 hover:border-red-200 px-4 py-2 rounded-lg transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Change Password */}
+        {showPwForm && (
+          <div className="bg-white rounded-2xl border border-parchment-100 shadow-soft p-6 sm:p-8 mb-6">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 rounded-xl bg-ember-50 text-ember-600 flex items-center justify-center flex-shrink-0">
+                <KeyRound className="w-4 h-4" />
+              </div>
+              <h2 className="font-serif font-semibold text-ink-900 text-lg">Change Password</h2>
+            </div>
+
+            {pwSuccess ? (
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">
+                <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                Password updated successfully!
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordChange} className="space-y-4 max-w-sm">
+                <div>
+                  <label className="block text-sm font-medium text-ink-700 mb-1.5">New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPwNew ? 'text' : 'password'}
+                      value={pwNew}
+                      onChange={e => setPwNew(e.target.value)}
+                      placeholder="At least 8 characters"
+                      required
+                      className="w-full px-4 py-2.5 pr-10 border border-parchment-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ember-300 focus:border-ember-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPwNew(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                    >
+                      {showPwNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-ink-700 mb-1.5">Confirm New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPwConfirm ? 'text' : 'password'}
+                      value={pwConfirm}
+                      onChange={e => setPwConfirm(e.target.value)}
+                      placeholder="Repeat new password"
+                      required
+                      className="w-full px-4 py-2.5 pr-10 border border-parchment-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ember-300 focus:border-ember-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPwConfirm(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                    >
+                      {showPwConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {pwError && (
+                  <p className="text-sm text-red-600 flex items-center gap-1.5">
+                    <XCircle className="w-4 h-4 flex-shrink-0" />
+                    {pwError}
+                  </p>
+                )}
+
+                <div className="flex gap-3 pt-1">
+                  <button
+                    type="submit"
+                    disabled={pwLoading}
+                    className="btn-primary text-sm px-5 py-2.5 disabled:opacity-60"
+                  >
+                    {pwLoading ? 'Updating…' : 'Update Password'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowPwForm(false); setPwError(''); setPwNew(''); setPwConfirm(''); }}
+                    className="text-sm text-ink-500 hover:text-ink-800 px-5 py-2.5 border border-parchment-200 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
 
         {/* Membership status */}
         {statusCfg && (
