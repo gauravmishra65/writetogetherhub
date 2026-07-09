@@ -69,10 +69,18 @@ export default function Footer() {
               A free community where new writers learn, share their work, receive kind feedback, and understand publishing.
             </p>
             <div className="flex items-center gap-3 mt-6">
-              {[Twitter, Facebook, Instagram, Youtube].map((Icon, i) => (
+              {[
+                { Icon: Twitter, href: 'https://twitter.com/writetogetherh', label: 'Twitter' },
+                { Icon: Facebook, href: '#', label: 'Facebook' },
+                { Icon: Instagram, href: '#', label: 'Instagram' },
+                { Icon: Youtube, href: '#', label: 'YouTube' },
+              ].map(({ Icon, href, label }) => (
                 <a
-                  key={i}
-                  href="#"
+                  key={label}
+                  href={href}
+                  target={href !== '#' ? '_blank' : undefined}
+                  rel={href !== '#' ? 'noopener noreferrer' : undefined}
+                  aria-label={label}
                   className="w-9 h-9 rounded-lg bg-ink-800 hover:bg-ember-600 flex items-center justify-center text-ink-400 hover:text-white transition-all duration-200"
                 >
                   <Icon className="w-4 h-4" />
