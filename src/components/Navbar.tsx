@@ -81,7 +81,7 @@ export default function Navbar() {
             <img
               src="/WriteTogetherHub.png"
               alt="Write Together Hub"
-              style={{ height: '48px', width: 'auto', display: 'block' }}
+              style={{ height: '96px', width: 'auto', display: 'block' }}
             />
           </Link>
 
@@ -145,7 +145,7 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-medium text-ink-600 hover:text-ember-600 transition-colors">
+                <Link to="/login" className="text-sm font-medium text-ink-600 hover:text-ember-600 transition-colors whitespace-nowrap">
                   Sign In
                 </Link>
                 <Link to="/register" className="btn-outline text-sm py-2 px-5">
