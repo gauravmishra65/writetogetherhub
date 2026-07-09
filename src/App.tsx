@@ -13,6 +13,8 @@ import CommunityRules from './pages/CommunityRules';
 import JoinFree from './pages/JoinFree';
 import Contact from './pages/Contact';
 import Register from './pages/Register';
+import Login from './pages/Login';
+import MemberArea from './pages/MemberArea';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApprovals from './pages/admin/AdminApprovals';
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="/join" element={<JoinFree />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/member" element={<MemberArea />} />
         </Route>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route

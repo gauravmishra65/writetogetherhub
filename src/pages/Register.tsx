@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   UserPlus, Mail, Phone, MapPin, BookOpen, Feather,
   CheckCircle, AlertCircle, ArrowRight, Clock, Globe,
-  Twitter, Facebook, Instagram, Youtube, Loader2,
+  Twitter, Facebook, Instagram, Youtube, Loader2, Lock, Eye, EyeOff,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -77,7 +77,7 @@ const socials = [
 const emptyForm = {
   name: '', email: '', phone: '', city: '', country: '',
   experience_level: '', writing_type: '', genres: [] as string[],
-  bio: '', how_heard: '',
+  bio: '', how_heard: '', password: '', confirmPassword: '',
 };
 
 export default function Register() {
@@ -86,6 +86,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const toggleGenre = (g: string) =>
     setForm(f => ({
@@ -95,6 +97,15 @@ export default function Register() {
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setError('');
     setStep(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -103,6 +114,18 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Create Supabase auth account
+    const { error: authErr } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+    });
+    if (authErr && authErr.message !== 'User already registered') {
+      setLoading(false);
+      setError(authErr.message);
+      return;
+    }
+
     const { error: err } = await supabase.from('registrations').insert({
       name: form.name,
       email: form.email,
@@ -195,15 +218,15 @@ export default function Register() {
                     Welcome to the Community!
                   </h2>
                   <p className="text-ink-600 leading-relaxed max-w-md mx-auto mb-6">
-                    Your registration is complete. Check your inbox for a welcome email with everything you need to get started at Write Together Hub.
+                    Your registration is complete. You can now sign in to your account and explore the community while your application is reviewed.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Link to="/start-here" className="btn-primary">
-                      Go to Start Here Guide
+                    <Link to="/member" className="btn-primary">
+                      Go to My Account
                       <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <Link to="/writer-forum" className="btn-secondary">
-                      Visit the Forum
+                    <Link to="/start-here" className="btn-secondary">
+                      Start Here Guide
                     </Link>
                   </div>
                 </div>
@@ -218,6 +241,13 @@ export default function Register() {
                       <p className="text-ink-500 text-sm">Your personal contact information</p>
                     </div>
                   </div>
+
+                  {error && (
+                    <div className="flex items-center gap-2 text-red-700 bg-red-50 border border-red-100 rounded-lg p-3 text-sm">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {error}
+                    </div>
+                  )}
 
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="sm:col-span-2">
@@ -302,6 +332,45 @@ export default function Register() {
                         <option value="">Select an option...</option>
                         {howHeardOptions.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
+                    </div>
+
+                    <div>
+                      <label className="form-label">Create Password <span className="text-red-400">*</span></label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          className="form-input pl-10 pr-10"
+                          placeholder="At least 8 characters"
+                          value={form.password}
+                          onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                          required
+                          minLength={8}
+                          autoComplete="new-password"
+                        />
+                        <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors" tabIndex={-1}>
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="form-label">Confirm Password <span className="text-red-400">*</span></label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <input
+                          type={showConfirm ? 'text' : 'password'}
+                          className="form-input pl-10 pr-10"
+                          placeholder="Re-enter your password"
+                          value={form.confirmPassword}
+                          onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                          required
+                          autoComplete="new-password"
+                        />
+                        <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors" tabIndex={-1}>
+                          {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
