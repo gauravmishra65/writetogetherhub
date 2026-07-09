@@ -96,7 +96,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Write Together Hub <onboarding@resend.dev>",
+        from: "Write Together Hub <noreply@writetogetherhub.com>",
         to: ["hello@writetogetherhub.com"],
         subject,
         html,
