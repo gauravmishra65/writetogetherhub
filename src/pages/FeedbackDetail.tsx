@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, MessageCircle, ThumbsUp, HelpCircle, Lightbulb,
-  Heart, AlertCircle, Loader2, CheckCircle, BookOpen, Calendar,
+  Heart, AlertCircle, Loader2, CheckCircle, BookOpen, Calendar, Clock,
 } from 'lucide-react';
 import { supabase, type FeedbackSubmission, type FeedbackReply } from '../lib/supabase';
 
@@ -38,7 +38,7 @@ export default function FeedbackDetail() {
     (async () => {
       const [{ data: sub, error: subErr }, { data: reps }] = await Promise.all([
         supabase.from('feedback_submissions').select('*').eq('id', id).maybeSingle(),
-        supabase.from('feedback_replies').select('*').eq('submission_id', id).eq('status', 'approved').order('created_at', { ascending: true }),
+        supabase.from('feedback_replies').select('*').eq('submission_id', id).neq('status', 'rejected').order('created_at', { ascending: true }),
       ]);
       setLoadingPage(false);
       if (subErr || !sub) { setNotFound(true); return; }
@@ -237,6 +237,12 @@ export default function FeedbackDetail() {
                           <p className="text-xs text-ink-400">{formatDate(reply.created_at)}</p>
                         </div>
                       </div>
+                      {reply.status === 'pending' && (
+                        <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                          <Clock className="w-3 h-3" />
+                          Pending review
+                        </span>
+                      )}
                     </div>
 
                     <div className="space-y-3">

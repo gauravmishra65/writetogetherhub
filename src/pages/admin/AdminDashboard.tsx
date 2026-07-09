@@ -4,7 +4,7 @@ import {
   Users, MessageSquare, FileText,
   Trophy, BookMarked, Mail, CheckCircle, XCircle,
   Flag, Clock, ChevronDown, ChevronUp, Save, RefreshCw,
-  BarChart3,
+  BarChart3, MessagesSquare,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AdminHeader from '../../components/AdminHeader';
@@ -26,12 +26,13 @@ const STATUS_CONFIG: Record<Status, { label: string; color: string; icon: React.
 };
 
 const TABS = [
-  { key: 'registrations',      label: 'Registrations',    icon: Users,        table: 'registrations' },
-  { key: 'join_requests',      label: 'Join Requests',    icon: BookMarked,   table: 'join_requests' },
-  { key: 'contact_messages',   label: 'Contact Messages', icon: Mail,         table: 'contact_messages' },
-  { key: 'feedback_submissions', label: 'Feedback',       icon: MessageSquare, table: 'feedback_submissions' },
-  { key: 'challenge_entries',  label: 'Challenges',       icon: Trophy,       table: 'challenge_entries' },
-  { key: 'forum_discussions',  label: 'Forum Posts',      icon: FileText,     table: 'forum_discussions' },
+  { key: 'registrations',        label: 'Registrations',    icon: Users,           table: 'registrations' },
+  { key: 'join_requests',        label: 'Join Requests',    icon: BookMarked,      table: 'join_requests' },
+  { key: 'contact_messages',     label: 'Contact Messages', icon: Mail,            table: 'contact_messages' },
+  { key: 'feedback_submissions', label: 'Feedback',         icon: MessageSquare,   table: 'feedback_submissions' },
+  { key: 'feedback_replies',     label: 'Replies',          icon: MessagesSquare,  table: 'feedback_replies' },
+  { key: 'challenge_entries',    label: 'Challenges',       icon: Trophy,          table: 'challenge_entries' },
+  { key: 'forum_discussions',    label: 'Forum Posts',      icon: FileText,        table: 'forum_discussions' },
 ] as const;
 
 type TabKey = typeof TABS[number]['key'];
@@ -57,6 +58,7 @@ function entryTitle(tab: TabKey, entry: Entry): string {
     case 'join_requests':      return `${entry.name as string} — ${entry.email as string}`;
     case 'contact_messages':   return `${(entry.subject as string) || 'No subject'} — ${entry.name as string}`;
     case 'feedback_submissions': return `${entry.title as string} by ${entry.author_name as string}`;
+    case 'feedback_replies':     return `Reply by ${entry.author_name as string}`;
     case 'challenge_entries':  return `${entry.challenge_title as string} — ${entry.author_name as string}`;
     case 'forum_discussions':  return `${entry.title as string} — ${entry.author_name as string}`;
     default: return entry.id;

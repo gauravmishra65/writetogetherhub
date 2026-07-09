@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MessageCircle, ThumbsUp, HelpCircle, Lightbulb, Heart, ArrowRight, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { MessageCircle, ThumbsUp, HelpCircle, Lightbulb, Heart, ArrowRight, AlertCircle, Loader2, CheckCircle, Search, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase, type FeedbackSubmission } from '../lib/supabase';
 
@@ -31,6 +31,23 @@ export default function FeedbackCorner() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const [searchName, setSearchName] = useState('');
+  const [searchResults, setSearchResults] = useState<FeedbackSubmission[] | null>(null);
+  const [searching, setSearching] = useState(false);
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (!searchName.trim()) return;
+    setSearching(true);
+    const { data } = await supabase
+      .from('feedback_submissions')
+      .select('*')
+      .ilike('author_name', `%${searchName.trim()}%`)
+      .order('created_at', { ascending: false });
+    setSearchResults((data as FeedbackSubmission[]) ?? []);
+    setSearching(false);
+  }
 
   useEffect(() => {
     fetchSubmissions();
@@ -253,6 +270,76 @@ export default function FeedbackCorner() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Find My Submissions */}
+      <section className="section-padding bg-white">
+        <div className="section-container">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-sky-100 text-sky-700 text-sm font-semibold px-4 py-2 rounded-full mb-4">
+                <User className="w-4 h-4" />
+                Track Your Feedback
+              </div>
+              <h2 className="section-title">Find My Submissions</h2>
+              <p className="section-subtitle">Enter the name or pen name you used when submitting to see all your excerpts and the feedback received.</p>
+            </div>
+
+            <form onSubmit={handleSearch} className="flex gap-3 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                <input
+                  type="text"
+                  className="form-input pl-10"
+                  placeholder="Your name or pen name…"
+                  value={searchName}
+                  onChange={(e) => { setSearchName(e.target.value); setSearchResults(null); }}
+                />
+              </div>
+              <button type="submit" disabled={searching || !searchName.trim()} className="btn-primary px-6 disabled:opacity-60">
+                {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                {searching ? 'Searching…' : 'Search'}
+              </button>
+            </form>
+
+            {searchResults !== null && (
+              searchResults.length === 0 ? (
+                <div className="text-center py-10 text-ink-400 card p-8">
+                  <User className="w-10 h-10 mx-auto mb-3 opacity-25" />
+                  <p className="font-medium mb-1">No submissions found for "{searchName}".</p>
+                  <p className="text-sm">Double-check the name you used when submitting your excerpt.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-ink-500 font-medium">{searchResults.length} submission{searchResults.length !== 1 ? 's' : ''} found for "{searchName}"</p>
+                  {searchResults.map((s) => (
+                    <div key={s.id} className="card p-5 flex items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className="badge bg-parchment-100 text-parchment-700">{s.genre}</span>
+                          {s.word_count && <span className="text-xs text-ink-400">{s.word_count}</span>}
+                        </div>
+                        <h3 className="font-serif font-semibold text-ink-900 text-base">{s.title}</h3>
+                        <p className="text-xs text-ink-400 mt-0.5 mb-2">by {s.author_name}</p>
+                        <div className="flex items-center gap-1.5 text-xs text-ink-500">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>{s.response_count} response{s.response_count !== 1 ? 's' : ''} received</span>
+                        </div>
+                      </div>
+                      <Link
+                        to={`/feedback-corner/${s.id}`}
+                        className="btn-primary text-xs py-2 px-4 flex-shrink-0"
+                      >
+                        View Feedback
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
         </div>
       </section>
 
