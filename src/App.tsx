@@ -20,6 +20,7 @@ import ResetPassword from './pages/ResetPassword';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApprovals from './pages/admin/AdminApprovals';
+import AdminMembers from './pages/admin/AdminMembers';
 
 export default function App() {
   return (
@@ -57,6 +58,14 @@ export default function App() {
           element={
             <AdminRoute>
               <AdminApprovals />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/members"
+          element={
+            <AdminRoute>
+              <AdminMembers />
             </AdminRoute>
           }
         />

@@ -1,4 +1,4 @@
-import { BookOpen, LogOut, Clock, UserCheck } from 'lucide-react';
+import { BookOpen, LogOut, Clock, UserCheck, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 type Props = {
@@ -13,6 +13,7 @@ export default function AdminHeader({ adminEmail, totalPending, onSignOut }: Pro
   const navItems = [
     { to: '/admin', label: 'All Entries' },
     { to: '/admin/approvals', label: 'Approvals', badge: totalPending },
+    { to: '/admin/members', label: 'Members' },
   ];
 
   return (
