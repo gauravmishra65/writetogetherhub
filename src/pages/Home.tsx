@@ -274,11 +274,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-          {testimonials.length === 0 && (
-            <p className="text-center text-xs text-ink-400 mt-6">
-              Sample testimonials shown — admin can add real ones from the admin panel.
-            </p>
-          )}
         </div>
       </section>
 
