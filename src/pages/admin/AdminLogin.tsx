@@ -26,8 +26,12 @@ export default function AdminLogin() {
       return;
     }
 
-    // Verify this user is an admin via the is_admin() SQL function
-    const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+    // Verify this user is an admin by checking the admins table directly
+    const { data: adminRecord, error: adminError } = await supabase
+      .from('admins')
+      .select('user_id')
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
 
     setLoading(false);
 
@@ -37,7 +41,7 @@ export default function AdminLogin() {
       return;
     }
 
-    if (!isAdmin) {
+    if (!adminRecord) {
       await supabase.auth.signOut();
       setError('Your account does not have admin access. Contact the site owner.');
       return;

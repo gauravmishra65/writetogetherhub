@@ -11,11 +11,13 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
     let cancelled = false;
 
     async function verifyAdmin(): Promise<boolean> {
-      // Server-side check via the is_admin() SQL function — this is the real enforcement.
-      // RLS policies also block all admin data queries/mutations for non-admins.
-      const { data, error } = await supabase.rpc('is_admin');
+      const { data, error } = await supabase
+        .from('admins')
+        .select('user_id')
+        .eq('user_id', session?.user?.id ?? '')
+        .maybeSingle();
       if (error) return false;
-      return data === true;
+      return data !== null;
     }
 
     async function check() {
