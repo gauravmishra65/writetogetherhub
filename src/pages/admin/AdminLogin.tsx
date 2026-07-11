@@ -2,8 +2,10 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 export default function AdminLogin() {
+  useDocumentTitle('Admin Sign In | Write Together Hub', 'Sign in to the Write Together Hub admin portal.');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,12 +26,8 @@ export default function AdminLogin() {
       return;
     }
 
-    // Verify this user is in the admins table
-    const { data: adminRow, error: adminError } = await supabase
-      .from('admins')
-      .select('user_id')
-      .eq('user_id', authData.user.id)
-      .maybeSingle();
+    // Verify this user is an admin via the is_admin() SQL function
+    const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
 
     setLoading(false);
 
@@ -39,7 +37,7 @@ export default function AdminLogin() {
       return;
     }
 
-    if (!adminRow) {
+    if (!isAdmin) {
       await supabase.auth.signOut();
       setError('Your account does not have admin access. Contact the site owner.');
       return;

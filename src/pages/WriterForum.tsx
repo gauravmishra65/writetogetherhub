@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { MessageSquare, Users, BookOpen, Star, Zap, HelpCircle, ArrowRight, TrendingUp, Loader2, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { MessageSquare, Users, BookOpen, Star, Zap, HelpCircle, ArrowRight, TrendingUp, Loader2, X, CheckCircle, AlertCircle, Clock, Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabase, type ForumDiscussion } from '../lib/supabase';
+import { supabase, type ForumDiscussion, type Registration } from '../lib/supabase';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 const categories = [
   {
@@ -73,36 +74,75 @@ function timeAgo(dateStr: string): string {
   return `${days} day${days !== 1 ? 's' : ''} ago`;
 }
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function WriterForum() {
+  useDocumentTitle('Writer Forum | Write Together Hub', 'Join the Writer Forum to ask questions, share work, give encouragement, and connect with other new writers from around the world.');
   const [discussions, setDiscussions] = useState<ForumDiscussion[]>([]);
   const [loadingDiscussions, setLoadingDiscussions] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ author_name: '', category: '', title: '' });
+  const [form, setForm] = useState({ category: '', title: '' });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState(false);
 
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<Registration | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
   useEffect(() => {
-    async function fetchDiscussions() {
-      const { data, error } = await supabase
-        .from('forum_discussions')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      setLoadingDiscussions(false);
-      if (!error && data) setDiscussions(data);
+    let cancelled = false;
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const { data: reg } = await supabase
+          .from('registrations')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!cancelled) setProfile(reg as Registration ?? null);
+      }
+      setAuthLoading(false);
     }
-    fetchDiscussions();
+    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) { setProfile(null); setAuthLoading(false); }
+    });
+    return () => { cancelled = true; subscription.unsubscribe(); };
   }, []);
+
+  const isMember = !!user && !!profile;
+
+  useEffect(() => {
+    if (user) fetchDiscussions();
+    else setLoadingDiscussions(false);
+  }, [user]);
+
+  async function fetchDiscussions() {
+    const { data, error } = await supabase
+      .from('forum_discussions')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    setLoadingDiscussions(false);
+    if (!error && data) setDiscussions(data);
+  }
 
   async function handleStartDiscussion(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) { setFormError('You must be signed in to post.'); return; }
     setSubmitting(true);
     setFormError('');
+    const authorName = profile?.name || user.email!.split('@')[0];
     const { error } = await supabase.from('forum_discussions').insert({
       category: form.category,
       title: form.title,
-      author_name: form.author_name,
+      author_name: authorName,
+      user_id: user.id,
+      status: 'pending',
     });
     setSubmitting(false);
     if (error) {
@@ -110,7 +150,7 @@ export default function WriterForum() {
       return;
     }
     supabase.functions.invoke('notify-new-joiner', {
-      body: { source: 'forum_discussion', author_name: form.author_name, category: form.category, title: form.title },
+      body: { source: 'forum_discussion', author_name: authorName, category: form.category, title: form.title },
     });
     setFormSuccess(true);
     const { data } = await supabase.from('forum_discussions').select('*').order('created_at', { ascending: false }).limit(10);
@@ -120,7 +160,7 @@ export default function WriterForum() {
   function closeModal() {
     setShowForm(false);
     setFormSuccess(false);
-    setForm({ author_name: '', category: '', title: '' });
+    setForm({ category: '', title: '' });
     setFormError('');
   }
 
@@ -140,18 +180,17 @@ export default function WriterForum() {
             <p className="section-subtitle max-w-2xl mx-auto">
               Ask questions, share work, give encouragement, and connect with other new writers from around the world. A friendly community awaits.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 mt-8">
-              <button onClick={() => setShowForm(true)} className="btn-primary">
-                Start a Discussion
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <Link to="/join" className="btn-secondary">
-                Join the Community
-              </Link>
-              <Link to="/community-rules" className="btn-secondary">
-                Community Rules
-              </Link>
-            </div>
+            {isMember && (
+              <div className="flex flex-wrap justify-center gap-4 mt-8">
+                <button onClick={() => setShowForm(true)} className="btn-primary">
+                  Start a Discussion
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <Link to="/community-rules" className="btn-secondary">
+                  Community Rules
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -200,62 +239,88 @@ export default function WriterForum() {
         </div>
       </section>
 
-      {/* Recent Discussions — live from Supabase */}
-      <section className="section-padding bg-parchment-50">
-        <div className="section-container">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="section-title">Recent Discussions</h2>
-              <p className="section-subtitle mt-2">The latest conversations happening in the community.</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2.5 hidden md:flex">
-                Start a Discussion
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <TrendingUp className="w-6 h-6 text-ember-400 hidden md:block" />
-            </div>
-          </div>
-
-          {loadingDiscussions ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-8 h-8 text-ember-400 animate-spin" />
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {discussions.map((d) => (
-                <div key={d.id} className="card p-5 flex items-center gap-4">
-                  <div className="hidden sm:flex flex-col items-center gap-1 text-center min-w-[52px]">
-                    <span className="font-bold text-ink-700 text-lg">{d.replies}</span>
-                    <span className="text-xs text-ink-400">replies</span>
-                  </div>
-                  <div className="w-px h-10 bg-parchment-100 hidden sm:block" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className={`badge text-xs font-semibold px-2.5 py-0.5 rounded-full ${categoryColors[d.category] || 'bg-parchment-100 text-parchment-700'}`}>
-                        {d.category}
-                      </span>
-                      {d.is_hot && (
-                        <span className="badge bg-ember-100 text-ember-700 text-xs">🔥 Hot</span>
-                      )}
-                    </div>
-                    <p className="font-medium text-ink-800 text-sm leading-snug truncate">{d.title}</p>
-                    <p className="text-xs text-ink-400 mt-1">by {d.author_name} &middot; {timeAgo(d.created_at)}</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-ink-300 flex-shrink-0" />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="mt-8 text-center">
-            <Link to="/join" className="btn-primary">
-              Join to Read All Discussions
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+      {/* Auth gate for discussions */}
+      {authLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 text-ember-400 animate-spin" />
         </div>
-      </section>
+      ) : !isMember ? (
+        <section className="section-padding bg-parchment-50">
+          <div className="section-container">
+            <div className="max-w-lg mx-auto text-center card p-10">
+              <div className="w-14 h-14 bg-ember-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                <Lock className="w-7 h-7 text-ember-600" />
+              </div>
+              <h2 className="font-serif font-bold text-2xl text-ink-900 mb-3">Members Only</h2>
+              <p className="text-ink-500 leading-relaxed mb-6">
+                Forum discussions are visible only to signed-in members. Sign in or join the community to read and participate.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link to="/login" className="btn-primary">Sign In <ArrowRight className="w-4 h-4" /></Link>
+                <Link to="/join" className="btn-secondary">Join to View and Share</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <>
+          {/* Recent Discussions — live from Supabase */}
+          <section className="section-padding bg-parchment-50">
+            <div className="section-container">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="section-title">Recent Discussions</h2>
+                  <p className="section-subtitle mt-2">The latest conversations happening in the community.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-2.5 hidden md:flex">
+                    Start a Discussion
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <TrendingUp className="w-6 h-6 text-ember-400 hidden md:block" />
+                </div>
+              </div>
+
+              {loadingDiscussions ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-8 h-8 text-ember-400 animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {discussions.map((d) => (
+                    <div key={d.id} className="card p-5 flex items-center gap-4">
+                      <div className="hidden sm:flex flex-col items-center gap-1 text-center min-w-[52px]">
+                        <span className="font-bold text-ink-700 text-lg">{d.replies}</span>
+                        <span className="text-xs text-ink-400">replies</span>
+                      </div>
+                      <div className="w-px h-10 bg-parchment-100 hidden sm:block" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className={`badge text-xs font-semibold px-2.5 py-0.5 rounded-full ${categoryColors[d.category] || 'bg-parchment-100 text-parchment-700'}`}>
+                            {d.category}
+                          </span>
+                          {d.is_hot && (
+                            <span className="badge bg-ember-100 text-ember-700 text-xs">Hot</span>
+                          )}
+                          {d.status === 'pending' && (
+                            <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                              <Clock className="w-3 h-3" />
+                              Pending
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-medium text-ink-800 text-sm leading-snug truncate">{d.title}</p>
+                        <p className="text-xs text-ink-400 mt-1">by {d.author_name} &middot; {timeAgo(d.created_at)}</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-ink-300 flex-shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Forum Guidelines */}
       <section className="section-padding bg-white">
@@ -274,7 +339,7 @@ export default function WriterForum() {
       </section>
 
       {/* Start a Discussion Modal */}
-      {showForm && (
+      {showForm && isMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
             <div className="flex items-center justify-between p-6 border-b border-parchment-100">
@@ -292,8 +357,8 @@ export default function WriterForum() {
                   <div className="w-14 h-14 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-7 h-7 text-sage-600" />
                   </div>
-                  <h4 className="font-serif font-bold text-xl text-ink-900 mb-2">Discussion Started!</h4>
-                  <p className="text-ink-500 text-sm mb-5">Your thread is now live in the forum.</p>
+                  <h4 className="font-serif font-bold text-xl text-ink-900 mb-2">Discussion Submitted!</h4>
+                  <p className="text-ink-500 text-sm mb-5">Your discussion has been submitted and is awaiting review by the community team. Once approved, it will appear in the forum.</p>
                   <button onClick={closeModal} className="btn-primary text-sm py-2.5 px-6">Done</button>
                 </div>
               ) : (
@@ -304,10 +369,7 @@ export default function WriterForum() {
                       {formError}
                     </div>
                   )}
-                  <div>
-                    <label className="form-label">Your Name / Pen Name <span className="text-red-400">*</span></label>
-                    <input type="text" className="form-input" placeholder="How to credit you" value={form.author_name} onChange={e => setForm(f => ({ ...f, author_name: e.target.value }))} required />
-                  </div>
+                  <p className="text-xs text-ink-400">Posting as <span className="font-semibold text-ink-600">{profile?.name || user?.email}</span></p>
                   <div>
                     <label className="form-label">Category <span className="text-red-400">*</span></label>
                     <select className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} required>

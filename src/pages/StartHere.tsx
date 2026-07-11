@@ -70,7 +70,10 @@ const steps = [
   },
 ];
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function StartHere() {
+  useDocumentTitle('Start Here | Write Together Hub', 'New to Write Together Hub? Start here to learn how the community works and how to get the most out of your membership.');
   return (
     <div>
       {/* Hero */}

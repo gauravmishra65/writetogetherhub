@@ -121,7 +121,10 @@ const sections = [
   },
 ];
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function PublishingHelp() {
+  useDocumentTitle('Publishing Help | Write Together Hub', 'Resources and guidance on self-publishing, traditional publishing, Amazon KDP, query letters, and book formatting for new writers.');
   return (
     <div>
       {/* Hero */}

@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, MessageCircle, ThumbsUp, HelpCircle, Lightbulb,
-  Heart, AlertCircle, Loader2, CheckCircle, BookOpen, Calendar, Clock,
+  Heart, AlertCircle, Loader2, CheckCircle, BookOpen, Calendar, Clock, Lock,
 } from 'lucide-react';
-import { supabase, type FeedbackSubmission, type FeedbackReply } from '../lib/supabase';
+import { supabase, type FeedbackSubmission, type FeedbackReply, type Registration } from '../lib/supabase';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
-const replyInitial = { author_name: '', liked: '', confused: '', suggestion: '', encouragement: '' };
+const replyInitial = { liked: '', confused: '', suggestion: '', encouragement: '' };
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -19,7 +20,10 @@ const SECTIONS = [
   { key: 'encouragement' as const, label: 'One Encouragement', icon: Heart,       color: 'border-ember-400 bg-ember-50',       textColor: 'text-ember-800',      labelColor: 'text-ember-700' },
 ];
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function FeedbackDetail() {
+  useDocumentTitle('Feedback Detail | Write Together Hub', 'Read an excerpt and share your kind, structured feedback using the four-step method.');
   const { id } = useParams<{ id: string }>();
 
   const [submission, setSubmission] = useState<FeedbackSubmission | null>(null);
@@ -33,8 +37,38 @@ export default function FeedbackDetail() {
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<Registration | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const { data: reg } = await supabase
+          .from('registrations')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!cancelled) setProfile(reg as Registration ?? null);
+      }
+      setAuthLoading(false);
+    }
+    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) { setProfile(null); setAuthLoading(false); }
+    });
+    return () => { cancelled = true; subscription.unsubscribe(); };
+  }, []);
+
   useEffect(() => {
     if (!id) return;
+    if (authLoading) return;
+    if (!user) { setLoadingPage(false); return; }
     (async () => {
       const [{ data: sub, error: subErr }, { data: reps }] = await Promise.all([
         supabase.from('feedback_submissions').select('*').eq('id', id).maybeSingle(),
@@ -45,32 +79,69 @@ export default function FeedbackDetail() {
       setSubmission(sub as FeedbackSubmission);
       setReplies((reps as FeedbackReply[]) ?? []);
     })();
-  }, [id]);
+  }, [id, user, authLoading]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!id) return;
+    if (!id || !user) { setSubmitError('You must be signed in to give feedback.'); return; }
     setSubmitting(true);
     setSubmitError('');
+    const authorName = profile?.name || user.email!.split('@')[0];
     const { error } = await supabase.from('feedback_replies').insert({
       submission_id: id,
-      author_name: form.author_name,
+      author_name: authorName,
+      user_id: user.id,
       liked: form.liked,
       confused: form.confused,
       suggestion: form.suggestion,
       encouragement: form.encouragement,
+      status: 'pending',
     });
     setSubmitting(false);
-    if (error) { setSubmitError('Something went wrong. Please try again.'); return; }
+    if (error) { setSubmitError(error.message || 'Something went wrong. Please try again.'); return; }
     setSubmitSuccess(true);
     setForm(replyInitial);
     setShowForm(false);
+    // Refresh replies
+    const { data: reps } = await supabase.from('feedback_replies').select('*').eq('submission_id', id).neq('status', 'rejected').order('created_at', { ascending: true });
+    setReplies((reps as FeedbackReply[]) ?? []);
   }
 
-  if (loadingPage) {
+  if (authLoading || loadingPage) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-ember-400 animate-spin" />
+      </div>
+    );
+  }
+
+  // Auth gate: non-members see join prompt, no content
+  if (!user || !profile) {
+    return (
+      <div className="bg-parchment-50 min-h-screen">
+        <div className="bg-white border-b border-parchment-100">
+          <div className="section-container py-4">
+            <Link to="/feedback-corner" className="inline-flex items-center gap-2 text-sm text-ink-500 hover:text-ember-600 transition-colors font-medium">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Feedback Corner
+            </Link>
+          </div>
+        </div>
+        <div className="section-container py-16">
+          <div className="max-w-lg mx-auto text-center card p-10">
+            <div className="w-14 h-14 bg-ember-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <Lock className="w-7 h-7 text-ember-600" />
+            </div>
+            <h2 className="font-serif font-bold text-2xl text-ink-900 mb-3">Members Only</h2>
+            <p className="text-ink-500 leading-relaxed mb-6">
+              Feedback excerpts and community replies are visible only to signed-in members. Sign in or join the community to view and share feedback.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link to="/login" className="btn-primary">Sign In</Link>
+              <Link to="/join" className="btn-secondary">Join to View and Share</Link>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -106,6 +177,12 @@ export default function FeedbackDetail() {
               <span className="badge bg-parchment-100 text-parchment-700">{submission.genre}</span>
               {submission.word_count && (
                 <span className="badge bg-sky-100 text-sky-700">{submission.word_count}</span>
+              )}
+              {submission.status === 'pending' && (
+                <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                  <Clock className="w-3 h-3" />
+                  Pending review
+                </span>
               )}
             </div>
             <h1 className="font-serif font-bold text-2xl text-ink-900 mb-1">{submission.title}</h1>
@@ -145,7 +222,7 @@ export default function FeedbackDetail() {
               <CheckCircle className="w-6 h-6 text-sage-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-sage-800 mb-1">Feedback submitted — thank you!</p>
-                <p className="text-sage-700 text-sm">Your feedback will appear once reviewed by the community team. Writers appreciate every response.</p>
+                <p className="text-sage-700 text-sm">Your feedback has been submitted and is awaiting review by the community team. Once approved, it will be visible to the writer and other members.</p>
                 <button onClick={() => setSubmitSuccess(false)} className="mt-3 btn-outline text-sm py-1.5">Give another response</button>
               </div>
             </div>
@@ -155,7 +232,7 @@ export default function FeedbackDetail() {
           {showForm && !submitSuccess && (
             <form onSubmit={handleSubmit} className="card p-8 space-y-5">
               <h2 className="font-serif font-bold text-xl text-ink-900">Share Your Feedback</h2>
-              <p className="text-sm text-ink-500">Follow the four-step method: be specific, kind, and constructive.</p>
+              <p className="text-sm text-ink-500">Follow the four-step method: be specific, kind, and constructive. Posting as <span className="font-semibold text-ink-700">{profile?.name || user?.email}</span>.</p>
 
               {submitError && (
                 <div className="flex items-center gap-2 text-red-700 bg-red-50 border border-red-100 rounded-lg p-3 text-sm">
@@ -163,18 +240,6 @@ export default function FeedbackDetail() {
                   {submitError}
                 </div>
               )}
-
-              <div>
-                <label className="form-label">Your Name / Pen Name <span className="text-red-400">*</span></label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="How should we credit you?"
-                  value={form.author_name}
-                  onChange={(e) => setForm((f) => ({ ...f, author_name: e.target.value }))}
-                  required
-                />
-              </div>
 
               {SECTIONS.map((s) => (
                 <div key={s.key} className={`rounded-xl border-l-4 p-5 ${s.color}`}>

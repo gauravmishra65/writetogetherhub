@@ -10,13 +10,12 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     let cancelled = false;
 
-    async function verifyAdmin(userId: string): Promise<boolean> {
-      const { data } = await supabase
-        .from('admins')
-        .select('user_id')
-        .eq('user_id', userId)
-        .maybeSingle();
-      return !!data;
+    async function verifyAdmin(): Promise<boolean> {
+      // Server-side check via the is_admin() SQL function — this is the real enforcement.
+      // RLS policies also block all admin data queries/mutations for non-admins.
+      const { data, error } = await supabase.rpc('is_admin');
+      if (error) return false;
+      return data === true;
     }
 
     async function check() {
@@ -26,7 +25,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
           if (!cancelled) { setIsAdmin(false); setChecking(false); }
           return;
         }
-        const admin = await verifyAdmin(session.user.id);
+        const admin = await verifyAdmin();
         if (!cancelled) { setIsAdmin(admin); setChecking(false); }
       } catch {
         if (!cancelled) { setIsAdmin(false); setChecking(false); }
@@ -40,8 +39,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
         if (!cancelled) { setIsAdmin(false); setChecking(false); }
         return;
       }
-      // Re-verify on any session change (covers SIGNED_IN after navigate)
-      verifyAdmin(session.user.id).then((admin) => {
+      verifyAdmin().then((admin) => {
         if (!cancelled) { setIsAdmin(admin); setChecking(false); }
       }).catch(() => {
         if (!cancelled) { setIsAdmin(false); setChecking(false); }

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { FileText, BookOpen, Users, CheckSquare, List, Download, ArrowRight } from 'lucide-react';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 const resources = [
   {
@@ -80,6 +82,7 @@ const categories = ['All', 'Planning', 'Characters', 'Editing', 'Feedback', 'Pub
 import { useState } from 'react';
 
 export default function FreeResources() {
+  useDocumentTitle('Free Resources | Write Together Hub', 'Free writing resources, templates, prompts, and tools for new writers from the Write Together Hub community.');
   const [activeCategory, setActiveCategory] = useState('All');
 
   const filtered = activeCategory === 'All'

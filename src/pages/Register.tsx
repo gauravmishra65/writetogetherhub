@@ -80,9 +80,14 @@ const emptyForm = {
   bio: '', how_heard: '', password: '', confirmPassword: '',
 };
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function Register() {
+  useDocumentTitle('Register as a Member | Write Together Hub', 'Register as a member of Write Together Hub to join our free community for new writers and unlock all features.');
   const [form, setForm] = useState(emptyForm);
   const [submitted, setSubmitted] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState(1);
@@ -122,39 +127,65 @@ export default function Register() {
     setLoading(true);
     setError('');
 
-    // Create Supabase auth account
     const normalizedEmail = form.email.trim().toLowerCase();
-    const { error: authErr } = await supabase.auth.signUp({
+    const { data: signUpData, error: authErr } = await supabase.auth.signUp({
       email: normalizedEmail,
       password: form.password,
+      options: { data: { name: form.name } },
     });
+
+    // "User already registered" is not fatal — they can proceed to sign in
     if (authErr && authErr.message !== 'User already registered') {
+      // Email rate limit / confirmation email failures are NOT fatal.
+      // The account may still have been created — check if we got a user back.
+      const isEmailThrottle =
+        authErr.message.toLowerCase().includes('rate limit') ||
+        authErr.message.toLowerCase().includes('email rate limit exceeded');
+
+      if (isEmailThrottle && signUpData?.user) {
+        // Account was created, just the confirmation email was throttled
+        setSubmitted(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      if (isEmailThrottle) {
+        setError('Your account has been created, but we couldn\'t send your confirmation email right now due to a rate limit. You can request a new confirmation link anytime.');
+        setSubmitted(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Other errors are fatal
       setLoading(false);
       setError(authErr.message);
       return;
     }
 
-    const { error: err } = await supabase.from('registrations').insert({
-      name: form.name,
-      email: normalizedEmail,
-      phone: form.phone || null,
-      city: form.city || null,
-      country: form.country || null,
-      experience_level: form.experience_level || null,
-      writing_type: form.writing_type || null,
-      genres: form.genres.length > 0 ? form.genres : null,
-      bio: form.bio || null,
-      how_heard: form.how_heard || null,
-    });
-    setLoading(false);
-    if (err) {
-      if (err.code === '23505') {
-        setError('This email is already registered. You are already a member!');
-      } else {
-        setError('Something went wrong. Please try again.');
-      }
-      return;
+    // The handle_new_user trigger auto-creates the registrations row.
+    // But if the user already existed (signUp returned no new session), we may need
+    // to upsert the registration with the form data. Try an upsert with the form fields.
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    const userId = currentUser?.id;
+
+    if (userId) {
+      await supabase.from('registrations').upsert({
+        user_id: userId,
+        name: form.name,
+        email: normalizedEmail,
+        phone: form.phone || null,
+        city: form.city || null,
+        country: form.country || null,
+        experience_level: form.experience_level || null,
+        writing_type: form.writing_type || null,
+        genres: form.genres.length > 0 ? form.genres : null,
+        bio: form.bio || null,
+        how_heard: form.how_heard || null,
+        status: 'pending',
+        role: 'member',
+      }, { onConflict: 'email' });
     }
+
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-new-joiner`, {
       method: 'POST',
       headers: {
@@ -175,8 +206,26 @@ export default function Register() {
         how_heard: form.how_heard || null,
       }),
     }).catch(() => {});
+
     setSubmitted(true);
+    setLoading(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!form.email) return;
+    setResending(true);
+    setResendMessage('');
+    const { error: resendErr } = await supabase.auth.resend({
+      type: 'signup',
+      email: form.email.trim().toLowerCase(),
+    });
+    setResending(false);
+    if (resendErr) {
+      setResendMessage('Could not send right now — please try again in a few minutes.');
+    } else {
+      setResendMessage('Confirmation email sent! Check your inbox.');
+    }
   };
 
   return (
@@ -223,14 +272,31 @@ export default function Register() {
                     <CheckCircle className="w-10 h-10 text-sage-600" />
                   </div>
                   <h2 className="font-serif font-bold text-3xl text-ink-900 mb-3">
-                    Welcome to the Community!
+                    Account Created!
                   </h2>
-                  <p className="text-ink-600 leading-relaxed max-w-md mx-auto mb-6">
-                    Your registration is complete. You can now sign in to your account and explore the community while your application is reviewed.
+                  <p className="text-ink-600 leading-relaxed max-w-md mx-auto mb-4">
+                    Your account has been created. We've sent a confirmation link to your email — click it to verify your address. You can also sign in and explore while you wait.
                   </p>
+                  {error && (
+                    <p className="text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm mb-4">
+                      {error}
+                    </p>
+                  )}
+                  <div className="mb-4">
+                    <button
+                      onClick={handleResendConfirmation}
+                      disabled={resending}
+                      className="text-sm text-ember-600 hover:text-ember-700 font-semibold transition-colors disabled:opacity-60"
+                    >
+                      {resending ? 'Sending…' : 'Resend confirmation email'}
+                    </button>
+                    {resendMessage && (
+                      <p className="text-xs text-ink-500 mt-2">{resendMessage}</p>
+                    )}
+                  </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Link to="/member" className="btn-primary">
-                      Go to My Account
+                    <Link to="/login" className="btn-primary">
+                      Sign In
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                     <Link to="/start-here" className="btn-secondary">

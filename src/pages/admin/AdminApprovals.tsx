@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AdminHeader from '../../components/AdminHeader';
+import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
 
@@ -269,6 +270,7 @@ function ApplicantCard({
 type FilterTab = 'pending' | 'approved' | 'rejected' | 'flagged' | 'all';
 
 export default function AdminApprovals() {
+  useDocumentTitle('Membership Approvals | Write Together Hub Admin', 'Review and approve membership registrations and join requests.');
   const navigate = useNavigate();
   const [applicants, setApplicants] = useState<MemberApplicant[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, CheckCircle, PenLine, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 const benefits = [
   'Free access to all community resources',
@@ -35,6 +36,7 @@ const interests = [
 ];
 
 export default function JoinFree() {
+  useDocumentTitle('Join Free | Write Together Hub', 'Join the Write Together Hub community for free. No cost, no barriers — just a welcoming space for new writers.');
   const [form, setForm] = useState({
     name: '', email: '', interest: [] as string[], experience: '',
     type: '' as string, message: '',

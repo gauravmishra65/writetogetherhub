@@ -2,8 +2,10 @@ import { useState, FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { KeyRound, Eye, EyeOff, AlertCircle, CheckCircle, ArrowRight, Feather } from 'lucide-react';
 import { supabase, checkPasswordBreached } from '../lib/supabase';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 export default function ResetPassword() {
+  useDocumentTitle('Reset Password | Write Together Hub', 'Set a new password for your Write Together Hub account.');
   const navigate = useNavigate();
   const [pwNew, setPwNew] = useState('');
   const [pwConfirm, setPwConfirm] = useState('');

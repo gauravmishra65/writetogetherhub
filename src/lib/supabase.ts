@@ -73,6 +73,7 @@ export type ForumDiscussion = {
   category: string;
   title: string;
   author_name: string;
+  user_id: string | null;
   replies: number;
   is_hot: boolean;
   status: AdminStatus;
@@ -90,6 +91,7 @@ export type FeedbackSubmission = {
   author_name: string;
   response_count: number;
   user_email: string | null;
+  user_id: string | null;
   status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
@@ -108,6 +110,8 @@ export type Registration = {
   bio: string | null;
   how_heard: string | null;
   status: AdminStatus;
+  role: 'member' | 'admin';
+  user_id: string | null;
   admin_notes: string | null;
   created_at: string;
 };
@@ -116,6 +120,7 @@ export type FeedbackReply = {
   id: string;
   submission_id: string;
   author_name: string;
+  user_id: string | null;
   liked: string;
   confused: string;
   suggestion: string;
@@ -130,7 +135,44 @@ export type ChallengeEntry = {
   challenge_title: string;
   entry_text: string;
   author_name: string;
+  user_id: string | null;
   status: AdminStatus;
   admin_notes: string | null;
   created_at: string;
 };
+
+/** Fetch the current user's registration row by user_id (preferred) or email fallback. */
+export async function getCurrentUserRegistration() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: null, error: null as Error | null };
+
+  const { data, error } = await supabase
+    .from('registrations')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (data) return { data: data as Registration, error: null };
+  if (error) return { data: null, error };
+
+  // Fallback: match by email
+  const { data: byEmail, error: emailErr } = await supabase
+    .from('registrations')
+    .select('*')
+    .eq('email', user.email!.toLowerCase())
+    .maybeSingle();
+
+  return { data: (byEmail as Registration) ?? null, error: emailErr };
+}
+
+/** Check if the current user is an admin (client-side preliminary check; RLS is the real enforcer). */
+export async function checkIsAdmin(): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data } = await supabase
+    .from('admins')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  return !!data;
+}

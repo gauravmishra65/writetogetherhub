@@ -75,7 +75,10 @@ const communityLinks = [
   { icon: Users, label: 'Publishing Help', sub: 'Understand publishing', path: '/publishing-help', color: 'bg-rose-50 text-rose-600' },
 ];
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function MemberArea() {
+  useDocumentTitle('My Account | Write Together Hub', 'View your member dashboard, registration status, feedback submissions, and community activity.');
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userEmail, setUserEmail] = useState('');
@@ -97,22 +100,47 @@ export default function MemberArea() {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
 
+  // Create missing registration
+  const [creatingReg, setCreatingReg] = useState(false);
+  const [createRegError, setCreateRegError] = useState('');
+
+  const handleCreateRegistration = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    setCreatingReg(true);
+    setCreateRegError('');
+    const { data, error } = await supabase
+      .from('registrations')
+      .insert({
+        user_id: user.id,
+        name: user.email!.split('@')[0],
+        email: user.email!.toLowerCase(),
+        status: 'pending',
+        role: 'member',
+      })
+      .select('name,email,city,country,experience_level,writing_type,genres,bio,status,role,user_id')
+      .maybeSingle();
+    setCreatingReg(false);
+    if (error) {
+      setCreateRegError('Could not create registration. Please try again.');
+      return;
+    }
+    if (data) setProfile({ ...data, source: 'registrations' });
+  };
+
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/login', { state: { from: '/member' } }); return; }
 
       setUserEmail(user.email ?? '');
-
-      // Emails in both tables are normalized to lowercase on insert (trigger).
-      // Auth also stores emails lowercase, so exact .eq() match is safe and reliable.
       const email = user.email!.toLowerCase();
 
-      // Fetch the user's feedback submissions and their replies in parallel
+      // Fetch feedback posts by user_id (preferred) or user_email fallback
       const { data: posts } = await supabase
         .from('feedback_submissions')
         .select('*')
-        .eq('user_email', email)
+        .or(`user_id.eq.${user.id},user_email.eq.${email}`)
         .order('created_at', { ascending: false });
 
       const postsList = (posts as FeedbackSubmission[]) ?? [];
@@ -135,9 +163,22 @@ export default function MemberArea() {
         setRepliesByPost(grouped);
       }
 
+      // Fetch registration by user_id (preferred), fallback to email
+      const { data: regByUid } = await supabase
+        .from('registrations')
+        .select('name,email,city,country,experience_level,writing_type,genres,bio,status,role,user_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (regByUid) {
+        setProfile({ ...regByUid, source: 'registrations' });
+        setLoading(false);
+        return;
+      }
+
       const { data: reg, error: regErr } = await supabase
         .from('registrations')
-        .select('name,email,city,country,experience_level,writing_type,genres,bio,status')
+        .select('name,email,city,country,experience_level,writing_type,genres,bio,status,role,user_id')
         .eq('email', email)
         .maybeSingle();
 
@@ -366,14 +407,25 @@ export default function MemberArea() {
         )}
 
         {!profile && (
-          <div className="rounded-2xl border border-parchment-200 bg-parchment-50 p-5 mb-6 flex items-start gap-4">
-            <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-sm text-amber-700">No registration found</p>
-              <p className="text-ink-600 text-sm mt-0.5">
-                You're signed in but we couldn't find a registration linked to this email.{' '}
-                <Link to="/register" className="text-ember-600 hover:underline font-medium">Complete your registration</Link> to join the community.
-              </p>
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 mb-6">
+            <div className="flex items-start gap-4">
+              <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold text-sm text-amber-800">No registration found</p>
+                <p className="text-ink-600 text-sm mt-0.5 mb-3">
+                  You're signed in but we couldn't find a registration linked to your account. Create one now to join the community and unlock all features.
+                </p>
+                {createRegError && (
+                  <p className="text-red-600 text-xs mb-2">{createRegError}</p>
+                )}
+                <button
+                  onClick={handleCreateRegistration}
+                  disabled={creatingReg}
+                  className="btn-primary text-sm py-2 px-5 disabled:opacity-60"
+                >
+                  {creatingReg ? 'Creating…' : 'Create My Registration'}
+                </button>
+              </div>
             </div>
           </div>
         )}

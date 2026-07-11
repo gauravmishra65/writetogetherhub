@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AdminHeader from '../../components/AdminHeader';
+import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
 
@@ -190,6 +191,7 @@ function EntryCard({
 }
 
 export default function AdminDashboard() {
+  useDocumentTitle('Admin Dashboard | Write Together Hub', 'Manage community submissions, feedback, forum posts, and challenges from the admin dashboard.');
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>('registrations');
   const [entries, setEntries] = useState<Entry[]>([]);

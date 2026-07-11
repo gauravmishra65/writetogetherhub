@@ -1,4 +1,5 @@
 import { Shield, CheckCircle, AlertTriangle, Heart } from 'lucide-react';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 const rules = [
   {
@@ -60,6 +61,7 @@ const rules = [
 ];
 
 export default function CommunityRules() {
+  useDocumentTitle('Community Rules | Write Together Hub', 'Read the community rules that make Write Together Hub a safe, welcoming space for new writers to learn and share.');
   return (
     <div>
       {/* Hero */}

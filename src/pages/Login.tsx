@@ -2,8 +2,10 @@ import { useState, FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight, CheckCircle, Feather } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 export default function Login() {
+  useDocumentTitle('Sign In | Write Together Hub', 'Sign in to your Write Together Hub account to access member-only features and community content.');
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string })?.from ?? '/member';

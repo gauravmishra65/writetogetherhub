@@ -10,7 +10,10 @@ const values = [
   { icon: Star, title: 'Genuine Encouragement', desc: 'We celebrate progress, not perfection. Every word written is a step worth celebrating.' },
 ];
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function About() {
+  useDocumentTitle('About | Write Together Hub', 'Learn about Write Together Hub and our mission to create a free, welcoming community for new writers to learn, share, and grow together.');
   return (
     <div>
       {/* Hero */}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, Twitter, Facebook, Instagram, Youtube, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
 
 const subjects = [
   'General Inquiry',
@@ -13,6 +14,7 @@ const subjects = [
 ];
 
 export default function Contact() {
+  useDocumentTitle('Contact | Write Together Hub', 'Get in touch with the Write Together Hub team. We would love to hear from you.');
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);

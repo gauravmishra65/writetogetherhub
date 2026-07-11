@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Zap, Clock, Target, Share2, ArrowRight, CheckCircle, AlertCircle, Loader2, X } from 'lucide-react';
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+import { supabase, type Registration } from '../lib/supabase';
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 const challenges = [
   {
@@ -96,15 +98,45 @@ const difficultyColors: Record<string, string> = {
 };
 
 export default function WeeklyChallenges() {
+  useDocumentTitle('Weekly Challenges | Write Together Hub', 'Participate in weekly writing challenges to stretch your creativity, practice your craft, and connect with fellow writers.');
   const [activeChallenge, setActiveChallenge] = useState<string | null>(null);
-  const [form, setForm] = useState({ author_name: '', entry_text: '' });
+  const [form, setForm] = useState({ entry_text: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<Registration | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const { data: reg } = await supabase
+          .from('registrations')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!cancelled) setProfile(reg as Registration ?? null);
+      }
+      setAuthLoading(false);
+    }
+    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) { setProfile(null); setAuthLoading(false); }
+    });
+    return () => { cancelled = true; subscription.unsubscribe(); };
+  }, []);
+
+  const isMember = !!user && !!profile;
 
   const openModal = (title: string) => {
     setActiveChallenge(title);
-    setForm({ author_name: '', entry_text: '' });
+    setForm({ entry_text: '' });
     setError('');
     setSuccess(false);
   };
@@ -116,12 +148,16 @@ export default function WeeklyChallenges() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) { setError('You must be signed in to submit an entry.'); return; }
     setSubmitting(true);
     setError('');
+    const authorName = profile?.name || user.email!.split('@')[0];
     const { error: err } = await supabase.from('challenge_entries').insert({
       challenge_title: activeChallenge,
       entry_text: form.entry_text,
-      author_name: form.author_name,
+      author_name: authorName,
+      user_id: user.id,
+      status: 'pending',
     });
     setSubmitting(false);
     if (err) {
@@ -129,7 +165,7 @@ export default function WeeklyChallenges() {
       return;
     }
     supabase.functions.invoke('notify-new-joiner', {
-      body: { source: 'challenge_entry', author_name: form.author_name, challenge_title: activeChallenge, entry_text: form.entry_text },
+      body: { source: 'challenge_entry', author_name: authorName, challenge_title: activeChallenge, entry_text: form.entry_text },
     });
     setSuccess(true);
   };
@@ -224,10 +260,17 @@ export default function WeeklyChallenges() {
                   <p className="text-ink-500 text-xs leading-relaxed italic mb-4">{challenge.sharePrompt}</p>
                 </div>
 
-                <button onClick={() => openModal(challenge.title)} className="btn-primary text-sm py-2.5">
-                  Submit My Entry
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {isMember ? (
+                  <button onClick={() => openModal(challenge.title)} className="btn-primary text-sm py-2.5">
+                    Submit My Entry
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <Link to="/login" className="btn-primary text-sm py-2.5">
+                    Sign In to Submit
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
             ))}
           </div>
@@ -282,17 +325,7 @@ export default function WeeklyChallenges() {
                       {error}
                     </div>
                   )}
-                  <div>
-                    <label className="form-label">Your Name / Pen Name <span className="text-red-400">*</span></label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="How to credit you"
-                      value={form.author_name}
-                      onChange={e => setForm(f => ({ ...f, author_name: e.target.value }))}
-                      required
-                    />
-                  </div>
+                  <p className="text-xs text-ink-400">Posting as <span className="font-semibold text-ink-600">{profile?.name || user?.email}</span></p>
                   <div>
                     <label className="form-label">Your Entry <span className="text-red-400">*</span></label>
                     <textarea

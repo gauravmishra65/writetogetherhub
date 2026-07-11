@@ -31,7 +31,10 @@ const promises = [
   { icon: Lightbulb, text: 'Practical publishing guidance' },
 ];
 
+import { useDocumentTitle } from '../lib/useDocumentTitle';
+
 export default function Home() {
+  useDocumentTitle('Write Together Hub | Free Community for New Writers', 'Join Write Together Hub, a free community where new writers learn, share work, receive kind feedback, and explore publishing together.');
   return (
     <div>
       {/* Hero */}
