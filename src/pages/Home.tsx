@@ -25,14 +25,6 @@ const journey = [
   { step: 4, icon: Target, title: 'Improve & Publish', desc: 'Refine your work with confidence, then explore self-publishing and traditional publishing paths with our free guides.' },
 ];
 
-const promises = [
-  { icon: CheckCircle, text: 'Always free to join and participate' },
-  { icon: Heart, text: 'Respectful, kind feedback every time' },
-  { icon: Shield, text: 'Writers keep full ownership of their work' },
-  { icon: Award, text: 'Beginner-friendly learning at every level' },
-  { icon: Users, text: 'Supportive community, no judgment' },
-  { icon: Lightbulb, text: 'Practical publishing guidance' },
-];
 
 import { useDocumentTitle } from '../lib/useDocumentTitle';
 
@@ -212,37 +204,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What You Can Do */}
-      <section className="section-padding bg-white">
-        <div className="section-container">
-          <div className="text-center mb-14">
-            <div className="badge bg-parchment-100 text-parchment-700 mb-4">Everything You Need</div>
-            <h2 className="section-title">What You Can Do Here</h2>
-            <p className="section-subtitle max-w-2xl mx-auto">
-              Every tool, guide, and community feature you need to grow as a writer — free, forever.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {features.map((feature) => (
-              <div key={feature.title} className="card p-6 flex flex-col">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${feature.color}`}>
-                  <feature.icon className="w-5 h-5" />
-                </div>
-                <h3 className="font-serif font-semibold text-ink-900 mb-2 text-lg leading-snug">{feature.title}</h3>
-                <p className="text-ink-500 text-sm leading-relaxed flex-1">{feature.desc}</p>
-                <Link
-                  to={feature.link}
-                  className="mt-4 inline-flex items-center gap-1.5 text-ember-600 hover:text-ember-700 text-sm font-semibold group"
-                >
-                  Explore
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Beginner Journey */}
       <section className="section-padding bg-gradient-to-b from-parchment-50 to-white">
         <div className="section-container">
@@ -279,90 +240,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Community Promise */}
-      <section className="section-padding bg-parchment-100">
-        <div className="section-container">
-          <div className="text-center mb-14">
-            <div className="badge bg-white text-ink-600 mb-4 shadow-sm">Our Commitment</div>
-            <h2 className="section-title">The Write Together Hub Promise</h2>
-            <p className="section-subtitle max-w-xl mx-auto">
-              These are not just words. They are the values that every member of our community agrees to uphold.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {promises.map((item) => (
-              <div key={item.text} className="flex items-center gap-4 bg-white rounded-xl p-5 shadow-sm border border-parchment-100">
-                <div className="w-10 h-10 rounded-full bg-sage-100 flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-sage-600" />
-                </div>
-                <p className="font-medium text-ink-800">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Today's Writing Prompt */}
-      <section className="section-padding bg-gradient-to-br from-parchment-50 via-white to-parchment-100">
-        <div className="section-container">
-          <div className="text-center mb-10">
-            <div className="badge bg-parchment-200 text-parchment-800 mb-4">Daily Inspiration</div>
-            <h2 className="section-title">Today's Writing Prompt</h2>
-          </div>
-          <div className="max-w-2xl mx-auto">
-            <div className="relative bg-white rounded-3xl shadow-warm border border-parchment-200 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-ember-500 via-ember-400 to-parchment-400" />
-              <div className="p-8 sm:p-10">
-                <div className="flex items-center gap-2 mb-5">
-                  <Feather className="w-5 h-5 text-ember-500" />
-                  <span className="text-ember-600 font-semibold text-sm uppercase tracking-wide">Featured Prompt</span>
-                </div>
-                <h3 className="font-serif font-bold text-ink-900 text-2xl sm:text-3xl mb-4 leading-snug">
-                  The Door That Was Never Opened
-                </h3>
-                <p className="text-ink-600 text-base leading-relaxed mb-6">
-                  Write 150–300 words about a character who finds a door in their home that they have never noticed before. What is behind it?
-                </p>
-                <div className="flex items-center gap-2 mb-8 text-ink-400 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>10–15 minutes</span>
-                </div>
-                <Link to="/weekly-challenges" className="btn-primary px-8 py-3.5 text-base inline-flex">
-                  Start Writing
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Writers Feel Safe Here */}
-      <section className="section-padding bg-ink-900">
-        <div className="section-container">
-          <div className="text-center mb-10">
-            <div className="badge bg-ink-800 text-parchment-300 mb-4">Community Values</div>
-            <h2 className="section-title text-white">Why Writers Feel Safe Here</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
-            {[
-              { icon: Heart, title: 'Free forever for beginner writers', color: 'bg-ember-900/50 text-ember-400' },
-              { icon: ThumbsUp, title: 'Kind feedback only', color: 'bg-sage-900/50 text-sage-400' },
-              { icon: Lock, title: 'Writers keep ownership of their work', color: 'bg-sky-900/50 text-sky-400' },
-              { icon: Shield, title: 'No plagiarism or copying allowed', color: 'bg-parchment-900/50 text-parchment-300' },
-            ].map((item) => (
-              <div key={item.title} className="flex flex-col items-center text-center bg-ink-800 rounded-2xl p-6 border border-ink-700">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
-                  <item.icon className="w-6 h-6" />
-                </div>
-                <p className="text-parchment-200 font-medium text-sm leading-snug">{item.title}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
+      {/* Testimonials — social proof right after the journey */}
       <section className="section-padding bg-parchment-100">
         <div className="section-container">
           <div className="text-center mb-12">
@@ -401,6 +279,105 @@ export default function Home() {
               Sample testimonials shown — admin can add real ones from the admin panel.
             </p>
           )}
+        </div>
+      </section>
+
+      {/* What You Can Do */}
+      <section className="section-padding bg-white">
+        <div className="section-container">
+          <div className="text-center mb-14">
+            <div className="badge bg-parchment-100 text-parchment-700 mb-4">Everything You Need</div>
+            <h2 className="section-title">What You Can Do Here</h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              Every tool, guide, and community feature you need to grow as a writer — free, forever.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {features.map((feature) => (
+              <div key={feature.title} className="card p-6 flex flex-col">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${feature.color}`}>
+                  <feature.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-serif font-semibold text-ink-900 mb-2 text-lg leading-snug">{feature.title}</h3>
+                <p className="text-ink-500 text-sm leading-relaxed flex-1">{feature.desc}</p>
+                <Link
+                  to={feature.link}
+                  className="mt-4 inline-flex items-center gap-1.5 text-ember-600 hover:text-ember-700 text-sm font-semibold group"
+                >
+                  Explore
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Community Values — merged from Promise + Safe Here */}
+      <section className="section-padding bg-ink-900">
+        <div className="section-container">
+          <div className="text-center mb-14">
+            <div className="badge bg-ink-800 text-parchment-300 mb-4">Our Commitment</div>
+            <h2 className="section-title text-white">Why Writers Feel Safe Here</h2>
+            <p className="section-subtitle max-w-2xl mx-auto text-ink-300">
+              These are not just words. They are the values every member agrees to uphold — the foundation of a community where beginners can grow without fear.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            {[
+              { icon: Heart, title: 'Always Free', desc: 'Free forever for every writer — no paywalls, no premium tiers, no hidden costs.', color: 'bg-ember-900/50 text-ember-400' },
+              { icon: ThumbsUp, title: 'Kind Feedback Only', desc: 'Constructive, respectful notes every time. Our community values kindness above all.', color: 'bg-sage-900/50 text-sage-400' },
+              { icon: Lock, title: 'You Own Your Work', desc: 'Writers keep full ownership. We share excerpts, never full manuscripts.', color: 'bg-sky-900/50 text-sky-400' },
+              { icon: Shield, title: 'No Plagiarism', desc: 'Copying or claiming others\' work is strictly prohibited and enforced.', color: 'bg-parchment-900/50 text-parchment-300' },
+              { icon: Award, title: 'Beginner-Friendly', desc: 'Learning at every level — no experience required, no judgment given.', color: 'bg-violet-900/50 text-violet-400' },
+              { icon: Lightbulb, title: 'Publishing Guidance', desc: 'Practical, plain-language guides for self-publishing and traditional paths.', color: 'bg-rose-900/50 text-rose-400' },
+            ].map((item) => (
+              <div key={item.title} className="flex items-start gap-4 bg-ink-800 rounded-xl p-5 border border-ink-700">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-parchment-200 font-semibold text-sm mb-1">{item.title}</p>
+                  <p className="text-ink-400 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Today's Writing Prompt */}
+      <section className="section-padding bg-gradient-to-br from-parchment-50 via-white to-parchment-100">
+        <div className="section-container">
+          <div className="text-center mb-10">
+            <div className="badge bg-parchment-200 text-parchment-800 mb-4">Daily Inspiration</div>
+            <h2 className="section-title">Today's Writing Prompt</h2>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <div className="relative bg-white rounded-3xl shadow-warm border border-parchment-200 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-ember-500 via-ember-400 to-parchment-400" />
+              <div className="p-8 sm:p-10">
+                <div className="flex items-center gap-2 mb-5">
+                  <Feather className="w-5 h-5 text-ember-500" />
+                  <span className="text-ember-600 font-semibold text-sm uppercase tracking-wide">Featured Prompt</span>
+                </div>
+                <h3 className="font-serif font-bold text-ink-900 text-2xl sm:text-3xl mb-4 leading-snug">
+                  The Door That Was Never Opened
+                </h3>
+                <p className="text-ink-600 text-base leading-relaxed mb-6">
+                  Write 150–300 words about a character who finds a door in their home that they have never noticed before. What is behind it?
+                </p>
+                <div className="flex items-center gap-2 mb-8 text-ink-400 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>10–15 minutes</span>
+                </div>
+                <Link to="/weekly-challenges" className="btn-primary px-8 py-3.5 text-base inline-flex">
+                  Start Writing
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

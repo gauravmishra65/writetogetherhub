@@ -10,48 +10,36 @@ const categories = [
     title: 'Introduce Yourself',
     desc: 'Tell the community who you are, what you write, and what brought you here. Every great journey starts with a hello.',
     color: 'bg-sky-50 text-sky-600 border-sky-100',
-    discussions: 248,
-    posts: 1240,
   },
   {
     icon: HelpCircle,
     title: 'Writing Questions',
     desc: 'Ask anything about the craft of writing — plot structure, grammar, dialogue, pacing, point of view, and more.',
     color: 'bg-parchment-100 text-parchment-700 border-parchment-200',
-    discussions: 532,
-    posts: 3891,
   },
   {
     icon: BookOpen,
     title: 'Share Your Work',
     desc: 'Post a short excerpt, a poem, or a first paragraph. This is a safe space. All feedback here is kind and constructive.',
     color: 'bg-sage-50 text-sage-600 border-sage-100',
-    discussions: 987,
-    posts: 5203,
   },
   {
     icon: MessageSquare,
     title: 'Feedback Requests',
     desc: 'Specifically request feedback on your excerpt. Tell reviewers what kind of feedback you are looking for.',
     color: 'bg-ember-50 text-ember-600 border-ember-100',
-    discussions: 741,
-    posts: 4112,
   },
   {
     icon: Star,
     title: 'Publishing Questions',
     desc: 'Ask about self-publishing, traditional publishing, Amazon KDP, agents, query letters, and book formatting.',
     color: 'bg-rose-50 text-rose-600 border-rose-100',
-    discussions: 328,
-    posts: 2045,
   },
   {
     icon: Zap,
     title: 'Weekly Challenges',
     desc: 'Discuss the current weekly writing challenge, share your entries, and celebrate each other\'s creative responses.',
     color: 'bg-violet-50 text-violet-600 border-violet-100',
-    discussions: 412,
-    posts: 2890,
   },
 ];
 
@@ -244,11 +232,7 @@ export default function WriterForum() {
                   <cat.icon className="w-5 h-5" />
                 </div>
                 <h3 className="font-serif font-semibold text-ink-900 text-lg mb-2">{cat.title}</h3>
-                <p className="text-ink-500 text-sm leading-relaxed mb-5">{cat.desc}</p>
-                <div className="flex items-center justify-between text-xs text-ink-400">
-                  <span>{cat.discussions.toLocaleString()} discussions</span>
-                  <span>{cat.posts.toLocaleString()} posts</span>
-                </div>
+                <p className="text-ink-500 text-sm leading-relaxed">{cat.desc}</p>
               </div>
             ))}
           </div>
