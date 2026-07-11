@@ -14,8 +14,8 @@ const resources = [
     category: 'Planning',
     color: 'bg-sky-50 text-sky-600 border-sky-100',
     pages: '4 pages',
-    pdf: '/resources/NOVEL-~1.PDF',
-    word: '/resources/NOVEL-~1.DOC',
+    pdf: '/resources/novel-planning-sheet.pdf',
+    word: '/resources/novel-planning-sheet.doc',
   },
   {
     icon: Users,
@@ -24,8 +24,8 @@ const resources = [
     category: 'Characters',
     color: 'bg-sage-50 text-sage-600 border-sage-100',
     pages: '2 pages',
-    pdf: '/resources/CHARAC~1.PDF',
-    word: '/resources/CHARAC~1.DOC',
+    pdf: '/resources/character-profile-template.pdf',
+    word: '/resources/character-profile-template.doc',
   },
   {
     icon: List,
@@ -34,8 +34,8 @@ const resources = [
     category: 'Planning',
     color: 'bg-parchment-100 text-parchment-700 border-parchment-200',
     pages: '1 page',
-    pdf: '/resources/CHAPTE~1.PDF',
-    word: '/resources/CHAPTE~1.DOC',
+    pdf: '/resources/chapter-outline-template.pdf',
+    word: '/resources/chapter-outline-template.doc',
   },
   {
     icon: CheckSquare,
@@ -54,7 +54,7 @@ const resources = [
     category: 'Feedback',
     color: 'bg-rose-50 text-rose-600 border-rose-100',
     pages: '2 pages',
-    pdf: '/resources/BETA-R~1.PDF',
+    pdf: '/resources/beta-reader-feedback-form.pdf',
     word: null,
   },
   {
@@ -64,8 +64,8 @@ const resources = [
     category: 'Publishing',
     color: 'bg-violet-50 text-violet-600 border-violet-100',
     pages: '2 pages',
-    pdf: '/resources/SELF-P~1.PDF',
-    word: '/resources/SELF-P~1.DOC',
+    pdf: '/resources/self-publishing-checklist.pdf',
+    word: '/resources/self-publishing-checklist.doc',
   },
   {
     icon: List,
@@ -74,8 +74,8 @@ const resources = [
     category: 'Publishing',
     color: 'bg-teal-50 text-teal-600 border-teal-100',
     pages: '3 pages',
-    pdf: '/resources/BOOK-L~1.PDF',
-    word: '/resources/BOOK-L~1.DOC',
+    pdf: '/resources/book-launch-checklist.pdf',
+    word: '/resources/book-launch-checklist.doc',
   },
   {
     icon: CheckSquare,
@@ -84,8 +84,8 @@ const resources = [
     category: 'Habit',
     color: 'bg-amber-50 text-amber-600 border-amber-100',
     pages: '1 page',
-    pdf: '/resources/DAILY-~1.PDF',
-    word: '/resources/DAILY-~1.DOC',
+    pdf: '/resources/daily-writing-tracker.pdf',
+    word: '/resources/daily-writing-tracker.doc',
   },
 ];
 
