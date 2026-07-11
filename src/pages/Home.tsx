@@ -228,7 +228,7 @@ export default function Home() {
               ].map((item, i) => (
                 <div key={i} className="bg-ink-800 rounded-xl p-5 border border-ink-700">
                   <p className="text-parchment-300 font-serif font-semibold text-sm mb-2">"{item.q}"</p>
-                  <p className="text-ink-500 text-sm leading-relaxed">{item.a}</p>
+                  <p className="text-ink-300 text-sm leading-relaxed">{item.a}</p>
                 </div>
               ))}
             </div>
@@ -370,7 +370,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-parchment-200 font-semibold text-sm mb-1">{item.title}</p>
-                  <p className="text-ink-500 text-xs leading-relaxed">{item.desc}</p>
+                  <p className="text-ink-300 text-xs leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
