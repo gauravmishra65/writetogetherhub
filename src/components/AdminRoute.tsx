@@ -10,11 +10,11 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     let cancelled = false;
 
-    async function verifyAdmin(): Promise<boolean> {
+    async function verifyAdmin(userId: string): Promise<boolean> {
       const { data, error } = await supabase
         .from('admins')
         .select('user_id')
-        .eq('user_id', session?.user?.id ?? '')
+        .eq('user_id', userId)
         .maybeSingle();
       if (error) return false;
       return data !== null;
@@ -27,7 +27,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
           if (!cancelled) { setIsAdmin(false); setChecking(false); }
           return;
         }
-        const admin = await verifyAdmin();
+        const admin = await verifyAdmin(session.user.id);
         if (!cancelled) { setIsAdmin(admin); setChecking(false); }
       } catch {
         if (!cancelled) { setIsAdmin(false); setChecking(false); }
@@ -41,7 +41,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
         if (!cancelled) { setIsAdmin(false); setChecking(false); }
         return;
       }
-      verifyAdmin().then((admin) => {
+      verifyAdmin(session.user.id).then((admin) => {
         if (!cancelled) { setIsAdmin(admin); setChecking(false); }
       }).catch(() => {
         if (!cancelled) { setIsAdmin(false); setChecking(false); }
