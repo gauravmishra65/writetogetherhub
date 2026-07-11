@@ -45,6 +45,33 @@ type Testimonial = {
   rating: number;
 };
 
+const PLACEHOLDER_TESTIMONIALS: Testimonial[] = [
+  {
+    id: 'placeholder-1',
+    author_name: 'Sarah M.',
+    author_role: 'Fiction Writer',
+    author_location: 'Manchester, UK',
+    quote: 'I posted my first paragraph trembling — and got three kind, specific notes within a day. This is the first place I\'ve felt safe sharing my writing.',
+    rating: 5,
+  },
+  {
+    id: 'placeholder-2',
+    author_name: 'James O.',
+    author_role: 'Poet & Memoirist',
+    author_location: 'Dublin, Ireland',
+    quote: 'The weekly prompts got me writing again after years of staring at a blank page. The community is warm, never pushy, and genuinely helpful.',
+    rating: 5,
+  },
+  {
+    id: 'placeholder-3',
+    author_name: 'Aisha K.',
+    author_role: 'Beginner Writer',
+    author_location: 'Toronto, Canada',
+    quote: 'I was terrified to call myself a writer. Six weeks here and I\'ve finished my first short story. The feedback method actually works.',
+    rating: 5,
+  },
+];
+
 export default function Home() {
   useDocumentTitle('Write Together Hub | Free Community for New Writers', 'Join Write Together Hub, a free community where new writers learn, share work, receive kind feedback, and explore publishing together.');
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -336,43 +363,46 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      {testimonials.length > 0 && (
-        <section className="section-padding bg-parchment-100">
-          <div className="section-container">
-            <div className="text-center mb-12">
-              <div className="badge bg-ember-50 text-ember-700 mb-4">From Our Members</div>
-              <h2 className="section-title">What Writers Are Saying</h2>
-              <p className="section-subtitle max-w-2xl mx-auto">
-                Real words from members of our growing community.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {testimonials.map((t) => (
-                <div key={t.id} className="card p-6 flex flex-col">
-                  <Quote className="w-8 h-8 text-ember-300 mb-3 flex-shrink-0" />
-                  <div className="flex items-center gap-0.5 mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < t.rating ? 'fill-ember-500 text-ember-500' : 'text-parchment-300'}`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-ink-700 leading-relaxed flex-1 italic">"{t.quote}"</p>
-                  <div className="mt-4 pt-4 border-t border-parchment-100">
-                    <p className="font-semibold text-ink-900 text-sm">{t.author_name}</p>
-                    {(t.author_role || t.author_location) && (
-                      <p className="text-xs text-ink-500 mt-0.5">
-                        {[t.author_role, t.author_location].filter(Boolean).join(' · ')}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+      <section className="section-padding bg-parchment-100">
+        <div className="section-container">
+          <div className="text-center mb-12">
+            <div className="badge bg-ember-50 text-ember-700 mb-4">From Our Members</div>
+            <h2 className="section-title">What Writers Are Saying</h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              Real words from members of our growing community.
+            </p>
           </div>
-        </section>
-      )}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(testimonials.length > 0 ? testimonials : PLACEHOLDER_TESTIMONIALS).map((t) => (
+              <div key={t.id} className="card p-6 flex flex-col">
+                <Quote className="w-8 h-8 text-ember-300 mb-3 flex-shrink-0" />
+                <div className="flex items-center gap-0.5 mb-3">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < t.rating ? 'fill-ember-500 text-ember-500' : 'text-parchment-300'}`}
+                    />
+                  ))}
+                </div>
+                <p className="text-ink-700 leading-relaxed flex-1 italic">"{t.quote}"</p>
+                <div className="mt-4 pt-4 border-t border-parchment-100">
+                  <p className="font-semibold text-ink-900 text-sm">{t.author_name}</p>
+                  {(t.author_role || t.author_location) && (
+                    <p className="text-xs text-ink-500 mt-0.5">
+                      {[t.author_role, t.author_location].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          {testimonials.length === 0 && (
+            <p className="text-center text-xs text-ink-400 mt-6">
+              Sample testimonials shown — admin can add real ones from the admin panel.
+            </p>
+          )}
+        </div>
+      </section>
 
       {/* CTA */}
       <section className="section-padding bg-gradient-to-br from-ember-600 to-ember-700 text-white relative overflow-hidden">
