@@ -622,23 +622,7 @@ export default function Register() {
                 </Link>
               </div>
 
-              <div className="bg-ink-900 rounded-2xl p-5 text-white">
-                <h3 className="font-serif font-bold text-lg mb-2">Why Register?</h3>
-                <ul className="space-y-2">
-                  {[
-                    'Post in the Writer Forum',
-                    'Submit work for feedback',
-                    'Enter weekly challenges',
-                    'Access all free resources',
-                    'Connect with fellow writers',
-                  ].map(item => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-ink-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-sage-400 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
             </div>
 
           </div>
