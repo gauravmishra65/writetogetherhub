@@ -79,8 +79,6 @@ const resources = [
 
 const categories = ['All', 'Planning', 'Characters', 'Editing', 'Feedback', 'Publishing', 'Habit'];
 
-import { useState } from 'react';
-
 export default function FreeResources() {
   useDocumentTitle('Free Resources | Write Together Hub', 'Free writing resources, templates, prompts, and tools for new writers from the Write Together Hub community.');
   const [activeCategory, setActiveCategory] = useState('All');
