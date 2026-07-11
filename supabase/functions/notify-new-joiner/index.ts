@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const FROM = "Write Together Hub <noreply@writetogetherhub.com>";
+const FROM = "Write Together Hub <hello@writetogetherhub.com>";
 const TO = ["hello@writetogetherhub.com"];
 
 function tableRows(rows: ([string, string] | null)[]): string {

@@ -67,6 +67,7 @@ export default function FeedbackCorner() {
     e.preventDefault();
     setSubmitting(true);
     setSubmitError('');
+    const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase.from('feedback_submissions').insert({
       title: form.title,
       genre: form.genre,
@@ -74,6 +75,7 @@ export default function FeedbackCorner() {
       feedback_type: form.feedback_type,
       excerpt: form.excerpt,
       author_name: form.author_name,
+      user_email: user?.email?.toLowerCase() ?? null,
     });
     setSubmitting(false);
     if (error) {

@@ -89,6 +89,7 @@ export type FeedbackSubmission = {
   excerpt: string;
   author_name: string;
   response_count: number;
+  user_email: string | null;
   status: AdminStatus;
   admin_notes: string | null;
   created_at: string;

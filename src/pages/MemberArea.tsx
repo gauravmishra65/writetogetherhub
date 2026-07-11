@@ -4,8 +4,9 @@ import {
   BookOpen, Edit3, MessageCircle, Trophy, FileText, Users,
   LogOut, Clock, CheckCircle, XCircle, Flag, Feather,
   ArrowRight, Mail, MapPin, Pen, KeyRound, Eye, EyeOff,
+  ThumbsUp, HelpCircle, Lightbulb, Heart, Calendar, ChevronDown, ChevronUp,
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, type FeedbackSubmission, type FeedbackReply } from '../lib/supabase';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
 
@@ -54,6 +55,17 @@ const STATUS_CONFIG: Record<Status, { label: string; bg: string; text: string; i
   },
 };
 
+const FEEDBACK_SECTIONS = [
+  { key: 'liked' as const,         label: 'What I Liked',    icon: ThumbsUp,   color: 'border-sage-400 bg-sage-50',     labelColor: 'text-sage-700' },
+  { key: 'confused' as const,      label: 'What Confused Me', icon: HelpCircle, color: 'border-sky-400 bg-sky-50',       labelColor: 'text-sky-700' },
+  { key: 'suggestion' as const,    label: 'One Suggestion',  icon: Lightbulb,  color: 'border-parchment-400 bg-parchment-50', labelColor: 'text-parchment-700' },
+  { key: 'encouragement' as const, label: 'One Encouragement', icon: Heart,    color: 'border-ember-400 bg-ember-50',   labelColor: 'text-ember-700' },
+];
+
+function formatPostDate(d: string) {
+  return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 const communityLinks = [
   { icon: BookOpen, label: 'Start Here', sub: 'Writing guides for beginners', path: '/start-here', color: 'bg-sky-50 text-sky-600' },
   { icon: Edit3, label: 'Writer Forum', sub: 'Share your work', path: '/writer-forum', color: 'bg-sage-50 text-sage-600' },
@@ -79,6 +91,12 @@ export default function MemberArea() {
   const [pwError, setPwError] = useState('');
   const [pwSuccess, setPwSuccess] = useState(false);
 
+  // My posts & feedback
+  const [myPosts, setMyPosts] = useState<FeedbackSubmission[]>([]);
+  const [repliesByPost, setRepliesByPost] = useState<Record<string, FeedbackReply[]>>({});
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [expandedPost, setExpandedPost] = useState<string | null>(null);
+
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -89,6 +107,33 @@ export default function MemberArea() {
       // Emails in both tables are normalized to lowercase on insert (trigger).
       // Auth also stores emails lowercase, so exact .eq() match is safe and reliable.
       const email = user.email!.toLowerCase();
+
+      // Fetch the user's feedback submissions and their replies in parallel
+      const { data: posts } = await supabase
+        .from('feedback_submissions')
+        .select('*')
+        .eq('user_email', email)
+        .order('created_at', { ascending: false });
+
+      const postsList = (posts as FeedbackSubmission[]) ?? [];
+      setMyPosts(postsList);
+      setLoadingPosts(false);
+
+      if (postsList.length > 0) {
+        const postIds = postsList.map((p) => p.id);
+        const { data: allReplies } = await supabase
+          .from('feedback_replies')
+          .select('*')
+          .in('submission_id', postIds)
+          .neq('status', 'rejected')
+          .order('created_at', { ascending: true });
+
+        const grouped: Record<string, FeedbackReply[]> = {};
+        for (const r of (allReplies as FeedbackReply[]) ?? []) {
+          (grouped[r.submission_id] ??= []).push(r);
+        }
+        setRepliesByPost(grouped);
+      }
 
       const { data: reg, error: regErr } = await supabase
         .from('registrations')
@@ -334,6 +379,151 @@ export default function MemberArea() {
             <p className="text-ink-600 leading-relaxed">{profile.bio}</p>
           </div>
         )}
+
+        {/* My Posts & Feedback */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-serif font-bold text-ink-900 text-xl">My Posts &amp; Feedback</h2>
+            <Link to="/feedback-corner" className="text-sm text-ember-600 hover:underline font-medium inline-flex items-center gap-1">
+              <Edit3 className="w-3.5 h-3.5" /> Submit new
+            </Link>
+          </div>
+
+          {loadingPosts ? (
+            <div className="card p-8 text-center text-ink-400">
+              <Feather className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">Loading your posts…</p>
+            </div>
+          ) : myPosts.length === 0 ? (
+            <div className="card p-8 text-center">
+              <BookOpen className="w-10 h-10 mx-auto mb-3 text-ink-300" />
+              <p className="font-medium text-ink-600 mb-1">You haven&apos;t submitted any posts yet.</p>
+              <p className="text-sm text-ink-400 mb-4">Share your writing in the Feedback Corner to receive community feedback.</p>
+              <Link to="/feedback-corner" className="btn-primary text-sm py-2 px-5 inline-flex items-center gap-2">
+                <Feather className="w-4 h-4" /> Submit your first piece
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {myPosts.map((post) => {
+                const replies = repliesByPost[post.id] ?? [];
+                const totalReplies = replies.length;
+                const approvedReplies = replies.filter((r) => r.status === 'approved').length;
+                const isExpanded = expandedPost === post.id;
+
+                return (
+                  <div key={post.id} className="card overflow-hidden">
+                    {/* Post header — clickable to expand */}
+                    <button
+                      onClick={() => setExpandedPost(isExpanded ? null : post.id)}
+                      className="w-full text-left p-5 flex items-start justify-between gap-4 hover:bg-parchment-50/50 transition-colors"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                          <span className="badge bg-parchment-100 text-parchment-700">{post.genre}</span>
+                          {post.word_count && <span className="badge bg-sky-100 text-sky-700">{post.word_count}</span>}
+                          {post.status === 'pending' && (
+                            <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                              <Clock className="w-3 h-3" /> Pending review
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-serif font-semibold text-ink-900 text-base mb-1 truncate">{post.title}</h3>
+                        <div className="flex items-center gap-3 text-xs text-ink-400">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" /> {formatPostDate(post.created_at)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageCircle className="w-3 h-3" />
+                            {totalReplies} feedback{totalReplies !== 1 ? 's' : ''}
+                            {approvedReplies > 0 && totalReplies !== approvedReplies && (
+                              <span className="text-ink-300">({approvedReplies} approved)</span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      {isExpanded
+                        ? <ChevronUp className="w-5 h-5 text-ink-300 flex-shrink-0 mt-1" />
+                        : <ChevronDown className="w-5 h-5 text-ink-300 flex-shrink-0 mt-1" />}
+                    </button>
+
+                    {/* Expanded view */}
+                    {isExpanded && (
+                      <div className="border-t border-parchment-100 px-5 py-5 space-y-5 bg-parchment-50/30">
+                        {/* Feedback requested */}
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 text-sm text-amber-800">
+                          <span className="font-semibold">Feedback requested: </span>{post.feedback_type}
+                        </div>
+
+                        {/* Excerpt */}
+                        <div className="bg-parchment-50 border border-parchment-100 rounded-xl p-5">
+                          <p className="font-serif text-ink-700 leading-relaxed whitespace-pre-wrap italic">{post.excerpt}</p>
+                        </div>
+
+                        <div className="text-right">
+                          <Link
+                            to={`/feedback-corner/${post.id}`}
+                            className="text-sm text-ember-600 hover:underline font-medium inline-flex items-center gap-1"
+                          >
+                            View on Feedback Corner <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </div>
+
+                        {/* Feedback received */}
+                        <div>
+                          <h4 className="font-serif font-bold text-ink-900 text-sm mb-3">
+                            Feedback Received
+                            {totalReplies > 0 && <span className="ml-1.5 text-ink-400 font-normal">({totalReplies})</span>}
+                          </h4>
+
+                          {totalReplies === 0 ? (
+                            <div className="text-center py-6 text-ink-400">
+                              <MessageCircle className="w-7 h-7 mx-auto mb-2 opacity-25" />
+                              <p className="text-sm">No feedback yet. Check back soon!</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {replies.map((reply) => (
+                                <div key={reply.id} className="bg-white rounded-xl border border-parchment-100 p-4">
+                                  <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-2.5">
+                                      <div className="w-8 h-8 rounded-full bg-ember-100 flex items-center justify-center text-ember-700 font-bold text-xs">
+                                        {reply.author_name.charAt(0).toUpperCase()}
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-ink-800 text-sm">{reply.author_name}</p>
+                                        <p className="text-xs text-ink-400">{formatPostDate(reply.created_at)}</p>
+                                      </div>
+                                    </div>
+                                    {reply.status === 'pending' && (
+                                      <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                                        <Clock className="w-3 h-3" /> Pending
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="space-y-2.5">
+                                    {FEEDBACK_SECTIONS.map((s) => (
+                                      <div key={s.key} className={`rounded-lg p-3 border-l-4 ${s.color}`}>
+                                        <p className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide mb-1 ${s.labelColor}`}>
+                                          <s.icon className="w-3 h-3" /> {s.label}
+                                        </p>
+                                        <p className="text-sm text-ink-700 leading-relaxed">{reply[s.key]}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Community links */}
         <div className="mb-2">
