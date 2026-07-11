@@ -16,6 +16,7 @@ import Contact from './pages/Contact';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import MemberArea from './pages/MemberArea';
+import ResetPassword from './pages/ResetPassword';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApprovals from './pages/admin/AdminApprovals';
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/member" element={<MemberArea />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route

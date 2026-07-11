@@ -182,7 +182,7 @@ describe('Login page', () => {
     await waitFor(() => {
       expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
         'reset@example.com',
-        expect.objectContaining({ redirectTo: expect.stringContaining('/member') }),
+        expect.objectContaining({ redirectTo: expect.stringContaining('/reset-password') }),
       );
     });
   });
