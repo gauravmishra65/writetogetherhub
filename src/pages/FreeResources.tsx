@@ -1,10 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FileText, BookOpen, Users, CheckSquare, List, Download, ArrowRight, Lock, LogIn } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { useState } from 'react';
+import { FileText, BookOpen, Users, CheckSquare, List, Download } from 'lucide-react';
 import { useDocumentTitle } from '../lib/useDocumentTitle';
-
-type MembershipState = 'loading' | 'guest' | 'pending' | 'approved' | 'rejected';
 
 const resources = [
   {
@@ -94,42 +90,6 @@ const categories = ['All', 'Planning', 'Characters', 'Editing', 'Feedback', 'Pub
 export default function FreeResources() {
   useDocumentTitle('Free Resources | Write Together Hub', 'Free writing resources, templates, prompts, and tools for new writers from the Write Together Hub community.');
   const [activeCategory, setActiveCategory] = useState('All');
-  const [membership, setMembership] = useState<MembershipState>('loading');
-
-  useEffect(() => {
-    const check = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setMembership('guest'); return; }
-
-      const email = user.email!.toLowerCase();
-      const { data: reg } = await supabase
-        .from('registrations')
-        .select('status')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (reg?.status) { setMembership(reg.status as MembershipState); return; }
-
-      const { data: regByEmail } = await supabase
-        .from('registrations')
-        .select('status')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (regByEmail?.status) { setMembership(regByEmail.status as MembershipState); return; }
-
-      const { data: join } = await supabase
-        .from('join_requests')
-        .select('status')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (join?.status) { setMembership(join.status as MembershipState); return; }
-
-      setMembership('guest');
-    };
-    check();
-  }, []);
 
   const filtered = activeCategory === 'All'
     ? resources
@@ -161,15 +121,15 @@ export default function FreeResources() {
           <div className="grid grid-cols-3 gap-6 max-w-md mx-auto text-center">
             <div>
               <p className="font-serif font-bold text-3xl text-ember-600">8</p>
-              <p className="text-sm text-ink-400 mt-1">Free Templates</p>
+              <p className="text-sm text-ink-500 mt-1">Free Templates</p>
             </div>
             <div className="border-x border-parchment-200">
               <p className="font-serif font-bold text-3xl text-ember-600">100%</p>
-              <p className="text-sm text-ink-400 mt-1">Free Forever</p>
+              <p className="text-sm text-ink-500 mt-1">Free Forever</p>
             </div>
             <div>
               <p className="font-serif font-bold text-3xl text-ember-600">2,400+</p>
-              <p className="text-sm text-ink-400 mt-1">Downloads</p>
+              <p className="text-sm text-ink-500 mt-1">Downloads</p>
             </div>
           </div>
         </div>
@@ -199,33 +159,6 @@ export default function FreeResources() {
       {/* Resources Grid */}
       <section className="section-padding bg-parchment-50">
         <div className="section-container">
-          {membership !== 'approved' && membership !== 'loading' && (
-            <div className="mb-8 rounded-xl border border-ember-200 bg-ember-50 px-6 py-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-ember-600 text-white flex items-center justify-center shrink-0">
-                <Lock className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-ink-800">
-                  {membership === 'guest' ? 'Downloads are for members only' : 'Your membership is being reviewed'}
-                </p>
-                <p className="text-sm text-ink-600 mt-0.5">
-                  {membership === 'guest'
-                    ? 'Sign in to your approved account to download all resources in PDF and Word format.'
-                    : 'Once your application is approved, all downloads will be unlocked.'}
-                </p>
-              </div>
-              {membership === 'guest' && (
-                <Link
-                  to="/login"
-                  state={{ from: '/free-resources' }}
-                  className="inline-flex items-center gap-2 bg-ember-600 hover:bg-ember-700 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors shrink-0"
-                >
-                  <LogIn className="w-4 h-4" />
-                  Sign in
-                </Link>
-              )}
-            </div>
-          )}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((resource) => (
               <div key={resource.title} className={`card p-6 flex flex-col border-t-4 ${resource.color.split(' ').pop()}`}>
@@ -234,62 +167,41 @@ export default function FreeResources() {
                 </div>
                 <div className="flex items-center justify-between mb-3">
                   <span className={`badge ${resource.color} text-xs`}>{resource.category}</span>
-                  <span className="text-xs text-ink-400">{resource.pages}</span>
+                  <span className="text-xs text-ink-500">{resource.pages}</span>
                 </div>
                 <h3 className="font-serif font-semibold text-ink-900 text-lg mb-2 leading-snug">{resource.title}</h3>
                 <p className="text-ink-500 text-sm leading-relaxed flex-1">{resource.desc}</p>
                 <div className="mt-5 space-y-2">
-                  {membership === 'approved' ? (
-                    resource.word ? (
-                      <div className="grid grid-cols-2 gap-2">
-                        <a
-                          href={resource.pdf}
-                          download
-                          className="flex items-center justify-center gap-1.5 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
-                        >
-                          <FileText className="w-4 h-4" />
-                          PDF
-                        </a>
-                        <a
-                          href={resource.word}
-                          download
-                          className="flex items-center justify-center gap-1.5 bg-ink-700 hover:bg-ink-800 text-white text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
-                        >
-                          <Download className="w-4 h-4" />
-                          Word
-                        </a>
-                      </div>
-                    ) : (
+                  {resource.word ? (
+                    <div className="grid grid-cols-2 gap-2">
                       <a
                         href={resource.pdf}
                         download
-                        className="w-full flex items-center justify-center gap-2 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors"
+                        className="flex items-center justify-center gap-1.5 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        PDF
+                      </a>
+                      <a
+                        href={resource.word}
+                        download
+                        className="flex items-center justify-center gap-1.5 bg-ink-700 hover:bg-ink-800 text-white text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
                       >
                         <Download className="w-4 h-4" />
-                        Download Free
+                        Word
                       </a>
-                    )
-                  ) : membership === 'loading' ? (
-                    <div className="w-full flex items-center justify-center gap-2 bg-ink-100 text-ink-400 text-sm font-semibold py-2.5 px-4 rounded-lg">
-                      <Download className="w-4 h-4" />
-                      Checking access…
-                    </div>
-                  ) : membership === 'pending' || membership === 'flagged' ? (
-                    <div className="w-full flex items-center justify-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 text-sm font-semibold py-2.5 px-4 rounded-lg">
-                      <Lock className="w-4 h-4" />
-                      Pending approval
                     </div>
                   ) : (
-                    <Link
-                      to="/login"
-                      state={{ from: '/free-resources' }}
-                      className="w-full flex items-center justify-center gap-2 bg-ink-700 hover:bg-ink-800 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors"
+                    <a
+                      href={resource.pdf}
+                      download
+                      className="w-full flex items-center justify-center gap-2 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors"
                     >
-                      <LogIn className="w-4 h-4" />
-                      Sign in to download
-                    </Link>
+                      <Download className="w-4 h-4" />
+                      Download Free
+                    </a>
                   )}
-                  <p className="text-center text-xs text-ink-400">Format: {resource.word ? 'PDF + Word' : 'PDF'}</p>
+                  <p className="text-center text-xs text-ink-500">Format: {resource.word ? 'PDF + Word' : 'PDF'}</p>
                 </div>
               </div>
             ))}

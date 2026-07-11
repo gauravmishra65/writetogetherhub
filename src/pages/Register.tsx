@@ -327,7 +327,7 @@ export default function Register() {
                     <div className="sm:col-span-2">
                       <label className="form-label">Full Name <span className="text-red-400">*</span></label>
                       <div className="relative">
-                        <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type="text"
                           className="form-input pl-10"
@@ -342,7 +342,7 @@ export default function Register() {
                     <div>
                       <label className="form-label">Email Address <span className="text-red-400">*</span></label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type="email"
                           className="form-input pl-10"
@@ -355,9 +355,9 @@ export default function Register() {
                     </div>
 
                     <div>
-                      <label className="form-label">Phone Number <span className="text-ink-400 font-normal">(optional)</span></label>
+                      <label className="form-label">Phone Number <span className="text-ink-500 font-normal">(optional)</span></label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type="tel"
                           className="form-input pl-10"
@@ -369,9 +369,9 @@ export default function Register() {
                     </div>
 
                     <div>
-                      <label className="form-label">City <span className="text-ink-400 font-normal">(optional)</span></label>
+                      <label className="form-label">City <span className="text-ink-500 font-normal">(optional)</span></label>
                       <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type="text"
                           className="form-input pl-10"
@@ -383,9 +383,9 @@ export default function Register() {
                     </div>
 
                     <div>
-                      <label className="form-label">Country <span className="text-ink-400 font-normal">(optional)</span></label>
+                      <label className="form-label">Country <span className="text-ink-500 font-normal">(optional)</span></label>
                       <div className="relative">
-                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type="text"
                           className="form-input pl-10"
@@ -411,7 +411,7 @@ export default function Register() {
                     <div>
                       <label className="form-label">Create Password <span className="text-red-400">*</span></label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           className="form-input pl-10 pr-10"
@@ -422,7 +422,7 @@ export default function Register() {
                           minLength={8}
                           autoComplete="new-password"
                         />
-                        <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors" tabIndex={-1}>
+                        <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 hover:text-ink-600 transition-colors" tabIndex={-1}>
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
@@ -431,7 +431,7 @@ export default function Register() {
                     <div>
                       <label className="form-label">Confirm Password <span className="text-red-400">*</span></label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                         <input
                           type={showConfirm ? 'text' : 'password'}
                           className="form-input pl-10 pr-10"
@@ -441,7 +441,7 @@ export default function Register() {
                           required
                           autoComplete="new-password"
                         />
-                        <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors" tabIndex={-1}>
+                        <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 hover:text-ink-600 transition-colors" tabIndex={-1}>
                           {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
@@ -508,13 +508,13 @@ export default function Register() {
                       ))}
                     </div>
                     {!form.writing_type && (
-                      <p className="text-xs text-ink-400 mt-2">Please select one type above</p>
+                      <p className="text-xs text-ink-500 mt-2">Please select one type above</p>
                     )}
                   </div>
 
                   <div>
                     <label className="form-label">
-                      Genre Interests <span className="text-ink-400 font-normal">(select all that apply)</span>
+                      Genre Interests <span className="text-ink-500 font-normal">(select all that apply)</span>
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {genreOptions.map(g => (
@@ -536,7 +536,7 @@ export default function Register() {
 
                   <div>
                     <label className="form-label">
-                      A Short Bio <span className="text-ink-400 font-normal">(optional)</span>
+                      A Short Bio <span className="text-ink-500 font-normal">(optional)</span>
                     </label>
                     <textarea
                       className="form-input resize-none"
@@ -581,9 +581,9 @@ export default function Register() {
                         <item.icon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-0.5">{item.label}</p>
+                        <p className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-0.5">{item.label}</p>
                         <p className="font-medium text-ink-800 text-sm">{item.value}</p>
-                        <p className="text-xs text-ink-400">{item.sub}</p>
+                        <p className="text-xs text-ink-500">{item.sub}</p>
                       </div>
                     </div>
                   ))}

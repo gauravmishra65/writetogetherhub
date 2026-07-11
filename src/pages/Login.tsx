@@ -73,7 +73,7 @@ export default function Login() {
               <div>
                 <label className="form-label">Email address</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
@@ -98,7 +98,7 @@ export default function Login() {
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
@@ -111,7 +111,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 hover:text-ink-600 transition-colors"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -156,7 +156,7 @@ export default function Login() {
               <div>
                 <label className="form-label">Email address</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
@@ -208,7 +208,7 @@ export default function Login() {
               join for free
             </Link>
           </p>
-          <div className="flex items-center justify-center gap-1.5 text-xs text-ink-400">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-ink-500">
             <BookOpen className="w-3.5 h-3.5" />
             Write Together Hub — Free community for writers
           </div>

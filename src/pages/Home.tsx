@@ -4,7 +4,7 @@ import {
   BookOpen, MessageCircle, Star, Zap, FileText, Users, ArrowRight,
   PenLine, CheckCircle, Heart, Shield, Award, Lightbulb, BookMarked,
   Edit3, Feather, Target, MousePointerClick, Share2, ThumbsUp, Clock, Lock,
-  Quote,
+  Quote, HelpCircle,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -40,26 +40,26 @@ type Testimonial = {
 const PLACEHOLDER_TESTIMONIALS: Testimonial[] = [
   {
     id: 'placeholder-1',
-    author_name: 'Sarah M.',
-    author_role: 'Fiction Writer',
-    author_location: 'Manchester, UK',
-    quote: 'I posted my first paragraph trembling — and got three kind, specific notes within a day. This is the first place I\'ve felt safe sharing my writing.',
+    author_name: 'Priya R.',
+    author_role: 'Writer',
+    author_location: 'Singapore',
+    quote: 'I posted the first chapter of my book and got kind, specific feedback within a day. It\'s the first time sharing my writing didn\'t feel scary.',
     rating: 5,
   },
   {
     id: 'placeholder-2',
-    author_name: 'James O.',
-    author_role: 'Poet & Memoirist',
-    author_location: 'Dublin, Ireland',
-    quote: 'The weekly prompts got me writing again after years of staring at a blank page. The community is warm, never pushy, and genuinely helpful.',
+    author_name: 'Daniel M.',
+    author_role: 'Aspiring Novelist',
+    author_location: 'Manchester',
+    quote: 'I went from \'I want to write\' to actually writing 200 words a day. The weekly challenges keep me showing up.',
     rating: 5,
   },
   {
     id: 'placeholder-3',
     author_name: 'Aisha K.',
-    author_role: 'Beginner Writer',
-    author_location: 'Toronto, Canada',
-    quote: 'I was terrified to call myself a writer. Six weeks here and I\'ve finished my first short story. The feedback method actually works.',
+    author_role: 'Short Story Writer',
+    author_location: 'Toronto',
+    quote: 'The feedback here is honest but never harsh. I finally understand what\'s working in my story and what isn\'t.',
     rating: 5,
   },
 ];
@@ -112,7 +112,7 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/join" className="btn-primary text-base px-8 py-4">
-                  Join Free Community
+                  Join Free
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link to="/start-here" className="btn-secondary text-base px-8 py-4">
@@ -124,44 +124,76 @@ export default function Home() {
               <div className="flex items-center gap-6 mt-10">
                 <div className="text-center">
                   <p className="font-serif font-bold text-2xl text-ink-900">100%</p>
-                  <p className="text-xs text-ink-400 font-medium">Free Forever</p>
+                  <p className="text-xs text-ink-500 font-medium">Free Forever</p>
                 </div>
                 <div className="w-px h-10 bg-parchment-200" />
                 <div className="text-center">
                   <p className="font-serif font-bold text-2xl text-ink-900">Kind</p>
-                  <p className="text-xs text-ink-400 font-medium">Feedback Only</p>
+                  <p className="text-xs text-ink-500 font-medium">Feedback Only</p>
                 </div>
                 <div className="w-px h-10 bg-parchment-200" />
                 <div className="text-center">
                   <p className="font-serif font-bold text-2xl text-ink-900">Yours</p>
-                  <p className="text-xs text-ink-400 font-medium">You Own Your Work</p>
+                  <p className="text-xs text-ink-500 font-medium">You Own Your Work</p>
                 </div>
               </div>
             </div>
 
-            {/* Hero illustration */}
+            {/* Product visual — feedback flow mockup */}
             <div className="hidden lg:flex justify-center items-center">
-              <div className="relative">
-                <div className="w-[420px] h-[420px] bg-gradient-to-br from-parchment-100 to-parchment-200 rounded-3xl flex items-center justify-center shadow-warm">
-                  <div className="grid grid-cols-2 gap-4 p-8">
-                    {[
-                      { icon: '✍️', label: 'Write Daily' },
-                      { icon: '📖', label: 'Read & Learn' },
-                      { icon: '💬', label: 'Get Feedback' },
-                      { icon: '📚', label: 'Get Published' },
-                    ].map((item, i) => (
-                      <div key={i} className="bg-white rounded-2xl p-6 shadow-soft flex flex-col items-center gap-3 text-center">
-                        <span className="text-4xl">{item.icon}</span>
-                        <span className="text-sm font-semibold text-ink-700">{item.label}</span>
+              <div className="relative w-[440px]">
+                <div className="bg-white rounded-2xl shadow-warm border border-parchment-200 overflow-hidden">
+                  {/* Header */}
+                  <div className="px-5 py-3.5 bg-parchment-50 border-b border-parchment-100 flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ember-400 to-ember-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">M</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-ink-800 text-sm leading-tight">The Last Garden</p>
+                      <p className="text-xs text-ink-500 leading-tight">by WordsByMaria · Literary Fiction</p>
+                    </div>
+                    <span className="text-xs bg-ember-50 text-ember-700 px-2 py-0.5 rounded-full font-medium">Excerpt</span>
+                  </div>
+                  {/* Excerpt preview */}
+                  <div className="px-5 py-4 border-b border-parchment-100">
+                    <p className="font-serif text-sm text-ink-700 italic leading-relaxed line-clamp-3">
+                      The gate needed two hands — one to lift the rusted latch, one to hold back the brambles that had claimed the path since Gran stopped walking it...
+                    </p>
+                  </div>
+                  {/* Feedback items */}
+                  <div className="px-5 py-4 space-y-3">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-sage-100 flex items-center justify-center text-sage-700 flex-shrink-0">
+                        <ThumbsUp className="w-3.5 h-3.5" />
                       </div>
-                    ))}
+                      <div className="flex-1">
+                        <p className="text-xs font-bold text-sage-700 uppercase tracking-wide mb-0.5">What I Liked</p>
+                        <p className="text-sm text-ink-700 leading-snug">The line about the gate needing two hands is incredibly evocative.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 flex-shrink-0">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-bold text-sky-700 uppercase tracking-wide mb-0.5">What Confused Me</p>
+                        <p className="text-sm text-ink-700 leading-snug">Wasn't sure initially if this was a visit or a memory of a visit.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-ember-100 flex items-center justify-center text-ember-700 flex-shrink-0">
+                        <Heart className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-bold text-ember-700 uppercase tracking-wide mb-0.5">Encouragement</p>
+                        <p className="text-sm text-ink-700 leading-snug">Your prose is genuinely lovely. This opening has real potential.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="absolute -top-4 -right-4 bg-ember-600 text-white rounded-2xl px-4 py-2 shadow-lg text-sm font-semibold">
-                  Beginner Friendly!
+                <div className="absolute -top-3 -right-3 bg-ember-600 text-white rounded-xl px-3 py-1.5 shadow-lg text-xs font-semibold">
+                  Kind Feedback
                 </div>
-                <div className="absolute -bottom-4 -left-4 bg-sage-600 text-white rounded-2xl px-4 py-2 shadow-lg text-sm font-semibold">
-                  Always Free!
+                <div className="absolute -bottom-3 -left-3 bg-sage-600 text-white rounded-xl px-3 py-1.5 shadow-lg text-xs font-semibold">
+                  Always Free
                 </div>
               </div>
             </div>
@@ -196,7 +228,7 @@ export default function Home() {
               ].map((item, i) => (
                 <div key={i} className="bg-ink-800 rounded-xl p-5 border border-ink-700">
                   <p className="text-parchment-300 font-serif font-semibold text-sm mb-2">"{item.q}"</p>
-                  <p className="text-ink-400 text-sm leading-relaxed">{item.a}</p>
+                  <p className="text-ink-500 text-sm leading-relaxed">{item.a}</p>
                 </div>
               ))}
             </div>
@@ -263,13 +295,18 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-ink-700 leading-relaxed flex-1 italic">"{t.quote}"</p>
-                <div className="mt-4 pt-4 border-t border-parchment-100">
-                  <p className="font-semibold text-ink-900 text-sm">{t.author_name}</p>
-                  {(t.author_role || t.author_location) && (
-                    <p className="text-xs text-ink-500 mt-0.5">
-                      {[t.author_role, t.author_location].filter(Boolean).join(' · ')}
-                    </p>
-                  )}
+                <div className="mt-4 pt-4 border-t border-parchment-100 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ember-400 to-ember-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    {t.author_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-ink-900 text-sm">{t.author_name}</p>
+                    {(t.author_role || t.author_location) && (
+                      <p className="text-xs text-ink-500 mt-0.5">
+                        {[t.author_role, t.author_location].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -333,7 +370,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-parchment-200 font-semibold text-sm mb-1">{item.title}</p>
-                  <p className="text-ink-400 text-xs leading-relaxed">{item.desc}</p>
+                  <p className="text-ink-500 text-xs leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -362,7 +399,7 @@ export default function Home() {
                 <p className="text-ink-600 text-base leading-relaxed mb-6">
                   Write 150–300 words about a character who finds a door in their home that they have never noticed before. What is behind it?
                 </p>
-                <div className="flex items-center gap-2 mb-8 text-ink-400 text-sm">
+                <div className="flex items-center gap-2 mb-8 text-ink-500 text-sm">
                   <Clock className="w-4 h-4" />
                   <span>10–15 minutes</span>
                 </div>

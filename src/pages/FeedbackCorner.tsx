@@ -171,7 +171,7 @@ export default function FeedbackCorner() {
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${item.color}`}>
                   <item.icon className="w-6 h-6" />
                 </div>
-                <div className="text-xs font-bold text-ink-400 uppercase tracking-wide mb-1">Step {item.step}</div>
+                <div className="text-xs font-bold text-ink-500 uppercase tracking-wide mb-1">Step {item.step}</div>
                 <h3 className="font-serif font-semibold text-ink-900 text-lg mb-3">{item.title}</h3>
                 <p className="text-ink-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
@@ -239,7 +239,7 @@ export default function FeedbackCorner() {
                   ) : (
                     <form onSubmit={handleSubmit} className="card p-8 space-y-5">
                       <h3 className="font-serif font-bold text-xl text-ink-900">Submit Your Excerpt</h3>
-                      <p className="text-xs text-ink-400">Posting as <span className="font-semibold text-ink-600">{profile?.name || user?.email}</span></p>
+                      <p className="text-xs text-ink-500">Posting as <span className="font-semibold text-ink-600">{profile?.name || user?.email}</span></p>
                       {submitError && (
                         <div className="flex items-center gap-2 text-red-700 bg-red-50 border border-red-100 rounded-lg p-3 text-sm">
                           <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -301,7 +301,7 @@ export default function FeedbackCorner() {
                   <Loader2 className="w-8 h-8 text-ember-400 animate-spin" />
                 </div>
               ) : submissions.length === 0 ? (
-                <div className="text-center py-16 text-ink-400">
+                <div className="text-center py-16 text-ink-500">
                   <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-30" />
                   <p>No submissions yet. Be the first to share your work!</p>
                 </div>
@@ -319,11 +319,11 @@ export default function FeedbackCorner() {
                         )}
                       </div>
                       <h3 className="font-serif font-semibold text-ink-900 text-lg mb-1">{s.title}</h3>
-                      <p className="text-xs text-ink-400 mb-2">by {s.author_name}</p>
+                      <p className="text-xs text-ink-500 mb-2">by {s.author_name}</p>
                       <p className="text-xs text-ink-500 mb-3">Seeking: {s.feedback_type}</p>
                       <p className="text-ink-600 text-sm leading-relaxed italic line-clamp-3 font-serif">{s.excerpt}</p>
                       <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-xs text-ink-400">
+                        <div className="flex items-center gap-1 text-xs text-ink-500">
                           <MessageCircle className="w-3.5 h-3.5" />
                           {s.response_count} response{s.response_count !== 1 ? 's' : ''}
                         </div>
@@ -357,7 +357,7 @@ export default function FeedbackCorner() {
 
                 <form onSubmit={handleSearch} className="flex gap-3 mb-6">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-500" />
                     <input
                       type="text"
                       className="form-input pl-10"
@@ -374,7 +374,7 @@ export default function FeedbackCorner() {
 
                 {searchResults !== null && (
                   searchResults.length === 0 ? (
-                    <div className="text-center py-10 text-ink-400 card p-8">
+                    <div className="text-center py-10 text-ink-500 card p-8">
                       <User className="w-10 h-10 mx-auto mb-3 opacity-25" />
                       <p className="font-medium mb-1">No submissions found for "{searchName}".</p>
                       <p className="text-sm">Double-check the name you used when submitting your excerpt.</p>
@@ -387,10 +387,10 @@ export default function FeedbackCorner() {
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
                               <span className="badge bg-parchment-100 text-parchment-700">{s.genre}</span>
-                              {s.word_count && <span className="text-xs text-ink-400">{s.word_count}</span>}
+                              {s.word_count && <span className="text-xs text-ink-500">{s.word_count}</span>}
                             </div>
                             <h3 className="font-serif font-semibold text-ink-900 text-base">{s.title}</h3>
-                            <p className="text-xs text-ink-400 mt-0.5 mb-2">by {s.author_name}</p>
+                            <p className="text-xs text-ink-500 mt-0.5 mb-2">by {s.author_name}</p>
                             <div className="flex items-center gap-1.5 text-xs text-ink-500">
                               <MessageCircle className="w-3.5 h-3.5" />
                               <span>{s.response_count} response{s.response_count !== 1 ? 's' : ''} received</span>
@@ -423,7 +423,7 @@ export default function FeedbackCorner() {
           </div>
           {sampleFeedback.map((fb, i) => (
             <div key={i} className="max-w-2xl mx-auto card p-7">
-              <p className="text-sm font-semibold text-ink-400 mb-5">Example feedback on: <span className="text-ink-700">"{fb.piece}"</span> by {fb.user}</p>
+              <p className="text-sm font-semibold text-ink-500 mb-5">Example feedback on: <span className="text-ink-700">"{fb.piece}"</span> by {fb.user}</p>
               <div className="space-y-4">
                 {[
                   { label: 'What I Liked', color: 'border-sage-400 bg-sage-50', textColor: 'text-sage-800', content: fb.liked },

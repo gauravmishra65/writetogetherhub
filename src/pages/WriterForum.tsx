@@ -291,7 +291,7 @@ export default function WriterForum() {
                     <div key={d.id} className="card p-5 flex items-center gap-4">
                       <div className="hidden sm:flex flex-col items-center gap-1 text-center min-w-[52px]">
                         <span className="font-bold text-ink-700 text-lg">{d.replies}</span>
-                        <span className="text-xs text-ink-400">replies</span>
+                        <span className="text-xs text-ink-500">replies</span>
                       </div>
                       <div className="w-px h-10 bg-parchment-100 hidden sm:block" />
                       <div className="flex-1 min-w-0">
@@ -310,7 +310,7 @@ export default function WriterForum() {
                           )}
                         </div>
                         <p className="font-medium text-ink-800 text-sm leading-snug truncate">{d.title}</p>
-                        <p className="text-xs text-ink-400 mt-1">by {d.author_name} &middot; {timeAgo(d.created_at)}</p>
+                        <p className="text-xs text-ink-500 mt-1">by {d.author_name} &middot; {timeAgo(d.created_at)}</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-ink-300 flex-shrink-0" />
                     </div>
@@ -344,7 +344,7 @@ export default function WriterForum() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
             <div className="flex items-center justify-between p-6 border-b border-parchment-100">
               <div>
-                <p className="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-0.5">Writer Forum</p>
+                <p className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-0.5">Writer Forum</p>
                 <h3 className="font-serif font-bold text-ink-900 text-lg">Start a Discussion</h3>
               </div>
               <button onClick={closeModal} className="w-8 h-8 rounded-full bg-parchment-100 hover:bg-parchment-200 flex items-center justify-center transition-colors">
@@ -369,7 +369,7 @@ export default function WriterForum() {
                       {formError}
                     </div>
                   )}
-                  <p className="text-xs text-ink-400">Posting as <span className="font-semibold text-ink-600">{profile?.name || user?.email}</span></p>
+                  <p className="text-xs text-ink-500">Posting as <span className="font-semibold text-ink-600">{profile?.name || user?.email}</span></p>
                   <div>
                     <label className="form-label">Category <span className="text-red-400">*</span></label>
                     <select className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} required>

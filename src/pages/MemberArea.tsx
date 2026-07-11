@@ -236,7 +236,7 @@ export default function MemberArea() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center text-ink-400">
+        <div className="text-center text-ink-500">
           <Feather className="w-8 h-8 animate-pulse mx-auto mb-3" />
           <p className="text-sm">Loading your account…</p>
         </div>
@@ -337,7 +337,7 @@ export default function MemberArea() {
                     <button
                       type="button"
                       onClick={() => setShowPwNew(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 hover:text-ink-600"
                     >
                       {showPwNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -358,7 +358,7 @@ export default function MemberArea() {
                     <button
                       type="button"
                       onClick={() => setShowPwConfirm(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 hover:text-ink-600"
                     >
                       {showPwConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -448,7 +448,7 @@ export default function MemberArea() {
           </div>
 
           {loadingPosts ? (
-            <div className="card p-8 text-center text-ink-400">
+            <div className="card p-8 text-center text-ink-500">
               <Feather className="w-8 h-8 mx-auto mb-2 opacity-30" />
               <p className="text-sm">Loading your posts…</p>
             </div>
@@ -456,7 +456,7 @@ export default function MemberArea() {
             <div className="card p-8 text-center">
               <BookOpen className="w-10 h-10 mx-auto mb-3 text-ink-300" />
               <p className="font-medium text-ink-600 mb-1">You haven&apos;t submitted any posts yet.</p>
-              <p className="text-sm text-ink-400 mb-4">Share your writing in the Feedback Corner to receive community feedback.</p>
+              <p className="text-sm text-ink-500 mb-4">Share your writing in the Feedback Corner to receive community feedback.</p>
               <Link to="/feedback-corner" className="btn-primary text-sm py-2 px-5 inline-flex items-center gap-2">
                 <Feather className="w-4 h-4" /> Submit your first piece
               </Link>
@@ -487,7 +487,7 @@ export default function MemberArea() {
                           )}
                         </div>
                         <h3 className="font-serif font-semibold text-ink-900 text-base mb-1 truncate">{post.title}</h3>
-                        <div className="flex items-center gap-3 text-xs text-ink-400">
+                        <div className="flex items-center gap-3 text-xs text-ink-500">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" /> {formatPostDate(post.created_at)}
                           </span>
@@ -531,11 +531,11 @@ export default function MemberArea() {
                         <div>
                           <h4 className="font-serif font-bold text-ink-900 text-sm mb-3">
                             Feedback Received
-                            {totalReplies > 0 && <span className="ml-1.5 text-ink-400 font-normal">({totalReplies})</span>}
+                            {totalReplies > 0 && <span className="ml-1.5 text-ink-500 font-normal">({totalReplies})</span>}
                           </h4>
 
                           {totalReplies === 0 ? (
-                            <div className="text-center py-6 text-ink-400">
+                            <div className="text-center py-6 text-ink-500">
                               <MessageCircle className="w-7 h-7 mx-auto mb-2 opacity-25" />
                               <p className="text-sm">No feedback yet. Check back soon!</p>
                             </div>
@@ -550,7 +550,7 @@ export default function MemberArea() {
                                       </div>
                                       <div>
                                         <p className="font-semibold text-ink-800 text-sm">{reply.author_name}</p>
-                                        <p className="text-xs text-ink-400">{formatPostDate(reply.created_at)}</p>
+                                        <p className="text-xs text-ink-500">{formatPostDate(reply.created_at)}</p>
                                       </div>
                                     </div>
                                     {reply.status === 'pending' && (
@@ -598,7 +598,7 @@ export default function MemberArea() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-ink-900 text-sm group-hover:text-ember-600 transition-colors">{item.label}</p>
-                  <p className="text-ink-400 text-xs mt-0.5">{item.sub}</p>
+                  <p className="text-ink-500 text-xs mt-0.5">{item.sub}</p>
                 </div>
                 <ArrowRight className="w-4 h-4 text-ink-300 group-hover:text-ember-500 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
               </Link>

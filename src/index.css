@@ -15,6 +15,14 @@
   h1, h2, h3 {
     @apply font-serif;
   }
+  /* Visible focus states for keyboard navigation */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-none ring-2 ring-ember-500 ring-offset-2 ring-offset-parchment-50 rounded-sm;
+  }
 }
 
 @layer components {
