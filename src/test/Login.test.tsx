@@ -212,7 +212,7 @@ describe('Login page', () => {
     await user.click(screen.getByRole('button', { name: /send reset link/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/could not send reset email/i)).toBeInTheDocument();
+      expect(screen.getByText(/SMTP error/i)).toBeInTheDocument();
     });
   });
 

@@ -38,7 +38,7 @@ export default function Login() {
     });
     setLoading(false);
     if (err) {
-      setError('Could not send reset email. Please check the address and try again.');
+      setError(err.message || 'Could not send reset email. Please check the address and try again.');
       return;
     }
     setResetSent(true);
