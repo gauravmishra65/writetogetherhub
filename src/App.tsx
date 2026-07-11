@@ -21,6 +21,7 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApprovals from './pages/admin/AdminApprovals';
 import AdminMembers from './pages/admin/AdminMembers';
+import AdminTestimonials from './pages/admin/AdminTestimonials';
 
 export default function App() {
   return (
@@ -66,6 +67,14 @@ export default function App() {
           element={
             <AdminRoute>
               <AdminMembers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/testimonials"
+          element={
+            <AdminRoute>
+              <AdminTestimonials />
             </AdminRoute>
           }
         />

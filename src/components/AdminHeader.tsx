@@ -14,6 +14,7 @@ export default function AdminHeader({ adminEmail, totalPending, onSignOut }: Pro
     { to: '/admin', label: 'All Entries' },
     { to: '/admin/approvals', label: 'Approvals', badge: totalPending },
     { to: '/admin/members', label: 'Members' },
+    { to: '/admin/testimonials', label: 'Testimonials' },
   ];
 
   return (
