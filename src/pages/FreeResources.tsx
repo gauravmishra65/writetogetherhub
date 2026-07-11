@@ -176,19 +176,6 @@ export default function FreeResources() {
         </div>
       </section>
 
-      {/* Bundle CTA */}
-      <section className="section-padding bg-ink-900 text-white">
-        <div className="section-container text-center">
-          <h2 className="section-title text-white mb-4">Want All Resources in One Download?</h2>
-          <p className="text-ink-300 text-lg mb-8 max-w-xl mx-auto">
-            Join the free community and get all eight resources delivered to your inbox as one convenient bundle.
-          </p>
-          <button className="inline-flex items-center gap-2 bg-ember-600 hover:bg-ember-700 text-white font-bold px-10 py-4 rounded-lg text-lg shadow-lg transition-all duration-200">
-            <Download className="w-5 h-5" />
-            Get the Full Bundle Free
-          </button>
-        </div>
-      </section>
     </div>
   );
 }
