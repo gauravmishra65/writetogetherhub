@@ -213,7 +213,7 @@ export default function FeedbackCorner() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link to="/login" className="btn-primary">Sign In <ArrowRight className="w-4 h-4" /></Link>
-                <Link to="/join" className="btn-secondary">Join to View and Share</Link>
+                <Link to="/join" className="btn-secondary">Join Free</Link>
               </div>
             </div>
           </div>
@@ -418,12 +418,12 @@ export default function FeedbackCorner() {
       <section className="section-padding bg-white">
         <div className="section-container">
           <div className="text-center mb-10">
-            <h2 className="section-title">What Kind Feedback Looks Like</h2>
-            <p className="section-subtitle max-w-xl mx-auto">Real feedback follows the four-step method — helpful, specific, and encouraging.</p>
+            <h2 className="section-title">What Good Feedback Looks Like</h2>
+            <p className="section-subtitle max-w-xl mx-auto">Here's an example of how kind, helpful feedback looks in our community.</p>
           </div>
           {sampleFeedback.map((fb, i) => (
             <div key={i} className="max-w-2xl mx-auto card p-7">
-              <p className="text-sm font-semibold text-ink-400 mb-5">Sample feedback on: <span className="text-ink-700">"{fb.piece}"</span> by {fb.user}</p>
+              <p className="text-sm font-semibold text-ink-400 mb-5">Example feedback on: <span className="text-ink-700">"{fb.piece}"</span> by {fb.user}</p>
               <div className="space-y-4">
                 {[
                   { label: 'What I Liked', color: 'border-sage-400 bg-sage-50', textColor: 'text-sage-800', content: fb.liked },

@@ -138,7 +138,7 @@ export default function FeedbackDetail() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/login" className="btn-primary">Sign In</Link>
-              <Link to="/join" className="btn-secondary">Join to View and Share</Link>
+              <Link to="/join" className="btn-secondary">Join Free</Link>
             </div>
           </div>
         </div>

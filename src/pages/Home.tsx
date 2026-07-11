@@ -73,7 +73,7 @@ export default function Home() {
                 </Link>
                 <Link to="/start-here" className="btn-secondary text-base px-8 py-4">
                   <BookOpen className="w-5 h-5" />
-                  Start Learning
+                  Start Writing
                 </Link>
               </div>
 
@@ -220,7 +220,7 @@ export default function Home() {
           </div>
           <div className="text-center mt-12">
             <Link to="/start-here" className="btn-primary px-8 py-4 text-base">
-              Begin Your Journey
+              Join Free
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -246,43 +246,6 @@ export default function Home() {
                 <p className="font-medium text-ink-800">{item.text}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Start Your First Writing Step */}
-      <section className="section-padding bg-white">
-        <div className="section-container">
-          <div className="text-center mb-12">
-            <div className="badge bg-ember-50 text-ember-700 mb-4">New Here?</div>
-            <h2 className="section-title">Start Your First Writing Step Today</h2>
-            <p className="section-subtitle max-w-2xl mx-auto">
-              New to writing? Begin with one simple prompt, share a short piece, and get kind feedback from other writers.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-6 mb-10">
-            {[
-              { icon: MousePointerClick, step: '1', title: 'Pick a Prompt', text: 'Choose a simple writing idea and write for 10–15 minutes.', color: 'bg-ember-50 text-ember-600' },
-              { icon: Share2, step: '2', title: 'Share a Short Piece', text: 'Post a paragraph, poem, scene, or idea inside the community.', color: 'bg-sage-50 text-sage-600' },
-              { icon: ThumbsUp, step: '3', title: 'Get Kind Feedback', text: 'Receive helpful comments using our friendly feedback method.', color: 'bg-sky-50 text-sky-600' },
-            ].map((card) => (
-              <div key={card.title} className="card p-8 flex flex-col items-center text-center relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-ink-900 text-white text-xs font-bold flex items-center justify-center shadow">
-                  {card.step}
-                </div>
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 mt-2 ${card.color}`}>
-                  <card.icon className="w-7 h-7" />
-                </div>
-                <h3 className="font-serif font-semibold text-ink-900 text-xl mb-3">{card.title}</h3>
-                <p className="text-ink-500 text-sm leading-relaxed">{card.text}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <Link to="/weekly-challenges" className="btn-primary px-8 py-4 text-base">
-              Try Today's Writing Prompt
-              <ArrowRight className="w-5 h-5" />
-            </Link>
           </div>
         </div>
       </section>

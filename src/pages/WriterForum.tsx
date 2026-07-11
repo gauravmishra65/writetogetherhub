@@ -89,6 +89,7 @@ export default function WriterForum() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Registration | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [stats, setStats] = useState<{ members: number; discussions: number; posts: number; countries: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,6 +121,22 @@ export default function WriterForum() {
     if (user) fetchDiscussions();
     else setLoadingDiscussions(false);
   }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      const [membersRes, discussionsRes, postsRes] = await Promise.all([
+        supabase.from('registrations').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+        supabase.from('forum_discussions').select('id', { count: 'exact', head: true }),
+        supabase.from('forum_posts').select('id', { count: 'exact', head: true }),
+      ]);
+      setStats({
+        members: membersRes.count ?? 0,
+        discussions: discussionsRes.count ?? 0,
+        posts: postsRes.count ?? 0,
+        countries: 0,
+      });
+    })();
+  }, []);
 
   async function fetchDiscussions() {
     const { data, error } = await supabase
@@ -198,16 +215,15 @@ export default function WriterForum() {
       {/* Stats */}
       <section className="py-10 bg-white border-y border-parchment-100">
         <div className="section-container">
-          <div className="grid grid-cols-4 gap-6 max-w-xl mx-auto text-center">
+          <div className="grid grid-cols-3 gap-6 max-w-lg mx-auto text-center">
             {[
-              { label: 'Active Members', value: '3,240+' },
-              { label: 'Discussions', value: '3,248' },
-              { label: 'Posts', value: '19,381' },
-              { label: 'Countries', value: '47' },
+              { label: 'Members', value: stats?.members ?? '—' },
+              { label: 'Discussions', value: stats?.discussions ?? '—' },
+              { label: 'Posts', value: stats?.posts ?? '—' },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="font-serif font-bold text-2xl text-ember-600">{stat.value}</p>
-                <p className="text-xs text-ink-400 mt-1">{stat.label}</p>
+                <p className="text-xs text-ink-500 mt-1">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -257,7 +273,7 @@ export default function WriterForum() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link to="/login" className="btn-primary">Sign In <ArrowRight className="w-4 h-4" /></Link>
-                <Link to="/join" className="btn-secondary">Join to View and Share</Link>
+                <Link to="/join" className="btn-secondary">Join Free</Link>
               </div>
             </div>
           </div>

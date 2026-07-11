@@ -70,8 +70,8 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled || menuOpen
-          ? 'bg-white/95 backdrop-blur-sm shadow-sm border-b border-parchment-100'
-          : 'bg-white/90 backdrop-blur-sm'
+          ? 'bg-white shadow-md border-b border-parchment-200'
+          : 'bg-white/95 backdrop-blur-md shadow-sm'
       }`}
     >
       <div className="section-container">
@@ -207,7 +207,7 @@ export default function Navbar() {
                     Register as Member
                   </Link>
                   <Link to="/join" className="btn-primary w-full text-sm py-3">
-                    Join Free Community
+                    Join Free
                   </Link>
                 </>
               )}
