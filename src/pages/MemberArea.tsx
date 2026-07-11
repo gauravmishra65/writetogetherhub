@@ -6,7 +6,7 @@ import {
   ArrowRight, Mail, MapPin, Pen, KeyRound, Eye, EyeOff,
   ThumbsUp, HelpCircle, Lightbulb, Heart, Calendar, ChevronDown, ChevronUp,
 } from 'lucide-react';
-import { supabase, type FeedbackSubmission, type FeedbackReply } from '../lib/supabase';
+import { supabase, checkPasswordBreached, type FeedbackSubmission, type FeedbackReply } from '../lib/supabase';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
 
@@ -177,6 +177,12 @@ export default function MemberArea() {
     if (pwNew.length < 8) { setPwError('Password must be at least 8 characters.'); return; }
     if (pwNew !== pwConfirm) { setPwError('Passwords do not match.'); return; }
     setPwLoading(true);
+    const breached = await checkPasswordBreached(pwNew);
+    if (breached) {
+      setPwLoading(false);
+      setPwError('This password has appeared in a known data breach. Please choose a different password.');
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password: pwNew });
     setPwLoading(false);
     if (error) { setPwError(error.message); return; }
