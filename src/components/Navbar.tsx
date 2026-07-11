@@ -81,7 +81,7 @@ export default function Navbar() {
             <img
               src="/WriteTogetherHub.png"
               alt="Write Together Hub"
-              style={{ height: '96px', width: 'auto', display: 'block' }}
+              style={{ height: '288px', width: 'auto', display: 'block' }}
             />
           </Link>
 
