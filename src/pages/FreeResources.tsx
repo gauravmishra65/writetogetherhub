@@ -10,7 +10,8 @@ const resources = [
     category: 'Planning',
     color: 'bg-sky-50 text-sky-600 border-sky-100',
     pages: '4 pages',
-    format: 'PDF + Word',
+    pdf: '/resources/NOVEL-~1.PDF',
+    word: '/resources/NOVEL-~1.DOC',
   },
   {
     icon: Users,
@@ -19,7 +20,8 @@ const resources = [
     category: 'Characters',
     color: 'bg-sage-50 text-sage-600 border-sage-100',
     pages: '2 pages',
-    format: 'PDF + Word',
+    pdf: '/resources/CHARAC~1.PDF',
+    word: '/resources/CHARAC~1.DOC',
   },
   {
     icon: List,
@@ -28,7 +30,8 @@ const resources = [
     category: 'Planning',
     color: 'bg-parchment-100 text-parchment-700 border-parchment-200',
     pages: '1 page',
-    format: 'PDF + Word',
+    pdf: '/resources/CHAPTE~1.PDF',
+    word: '/resources/CHAPTE~1.DOC',
   },
   {
     icon: CheckSquare,
@@ -37,7 +40,8 @@ const resources = [
     category: 'Editing',
     color: 'bg-ember-50 text-ember-600 border-ember-100',
     pages: '3 pages',
-    format: 'PDF',
+    pdf: '/resources/editing-checklist.pdf',
+    word: '/resources/editing-checklist.docx',
   },
   {
     icon: FileText,
@@ -46,7 +50,8 @@ const resources = [
     category: 'Feedback',
     color: 'bg-rose-50 text-rose-600 border-rose-100',
     pages: '2 pages',
-    format: 'PDF + Word',
+    pdf: '/resources/BETA-R~1.PDF',
+    word: null,
   },
   {
     icon: BookOpen,
@@ -55,7 +60,8 @@ const resources = [
     category: 'Publishing',
     color: 'bg-violet-50 text-violet-600 border-violet-100',
     pages: '2 pages',
-    format: 'PDF',
+    pdf: '/resources/SELF-P~1.PDF',
+    word: '/resources/SELF-P~1.DOC',
   },
   {
     icon: List,
@@ -64,7 +70,8 @@ const resources = [
     category: 'Publishing',
     color: 'bg-teal-50 text-teal-600 border-teal-100',
     pages: '3 pages',
-    format: 'PDF',
+    pdf: '/resources/BOOK-L~1.PDF',
+    word: '/resources/BOOK-L~1.DOC',
   },
   {
     icon: CheckSquare,
@@ -73,7 +80,8 @@ const resources = [
     category: 'Habit',
     color: 'bg-amber-50 text-amber-600 border-amber-100',
     pages: '1 page',
-    format: 'PDF',
+    pdf: '/resources/DAILY-~1.PDF',
+    word: '/resources/DAILY-~1.DOC',
   },
 ];
 
@@ -164,11 +172,36 @@ export default function FreeResources() {
                 <h3 className="font-serif font-semibold text-ink-900 text-lg mb-2 leading-snug">{resource.title}</h3>
                 <p className="text-ink-500 text-sm leading-relaxed flex-1">{resource.desc}</p>
                 <div className="mt-5 space-y-2">
-                  <button className="w-full flex items-center justify-center gap-2 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors">
-                    <Download className="w-4 h-4" />
-                    Download Free
-                  </button>
-                  <p className="text-center text-xs text-ink-400">Format: {resource.format}</p>
+                  {resource.word ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <a
+                        href={resource.pdf}
+                        download
+                        className="flex items-center justify-center gap-1.5 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        PDF
+                      </a>
+                      <a
+                        href={resource.word}
+                        download
+                        className="flex items-center justify-center gap-1.5 bg-ink-700 hover:bg-ink-800 text-white text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                        Word
+                      </a>
+                    </div>
+                  ) : (
+                    <a
+                      href={resource.pdf}
+                      download
+                      className="w-full flex items-center justify-center gap-2 bg-ember-600 hover:bg-ember-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download Free
+                    </a>
+                  )}
+                  <p className="text-center text-xs text-ink-400">Format: {resource.word ? 'PDF + Word' : 'PDF'}</p>
                 </div>
               </div>
             ))}
