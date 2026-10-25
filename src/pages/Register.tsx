@@ -614,10 +614,10 @@ export default function Register() {
                   <h3 className="font-semibold text-ink-900 text-sm">Already have an account?</h3>
                 </div>
                 <p className="text-ink-500 text-sm leading-relaxed mb-3">
-                  If you have already joined via our Join Free page your account is ready — head to the forum to get started.
+                  If you asked to join through our Join Free page, there is nothing more to do here. We will email you a link to create your password as soon as you are approved.
                 </p>
-                <Link to="/writer-forum" className="inline-flex items-center gap-1.5 text-ember-600 hover:text-ember-700 text-sm font-semibold transition-colors">
-                  Visit the Forum
+                <Link to="/login" className="inline-flex items-center gap-1.5 text-ember-600 hover:text-ember-700 text-sm font-semibold transition-colors">
+                  Sign In
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
