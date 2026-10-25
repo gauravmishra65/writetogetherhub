@@ -7,6 +7,7 @@ import {
   BarChart3, MessagesSquare,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { approveApplicant, isApplicantTable, type DecisionResult } from '../../lib/approveApplicant';
 import AdminHeader from '../../components/AdminHeader';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
@@ -98,7 +99,7 @@ function EntryCard({
 }: {
   tab: TabKey;
   entry: Entry;
-  onUpdate: (id: string, status: Status, notes: string) => Promise<void>;
+  onUpdate: (id: string, status: Status, notes: string) => Promise<boolean>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus] = useState<Status>(entry.status ?? 'pending');
@@ -110,8 +111,9 @@ function EntryCard({
 
   const save = async () => {
     setSaving(true);
-    await onUpdate(entry.id, status, notes);
+    const ok = await onUpdate(entry.id, status, notes);
     setSaving(false);
+    if (!ok) return;
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -197,6 +199,7 @@ export default function AdminDashboard() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<Status | 'all'>('all');
+  const [notice, setNotice] = useState<DecisionResult | null>(null);
   const [counts, setCounts] = useState<Record<TabKey, number>>({} as Record<TabKey, number>);
   const [adminEmail, setAdminEmail] = useState('');
 
@@ -230,11 +233,24 @@ export default function AdminDashboard() {
   useEffect(() => { fetchEntries(); }, [fetchEntries]);
   useEffect(() => { fetchCounts(); }, [fetchCounts]);
 
-  const handleUpdate = async (id: string, status: Status, admin_notes: string) => {
+  const handleUpdate = async (id: string, status: Status, admin_notes: string): Promise<boolean> => {
     const tab = TABS.find((t) => t.key === activeTab)!;
-    await supabase.from(tab.table).update({ status, admin_notes }).eq('id', id);
+    const previous = entries.find((e) => e.id === id);
+    let result: DecisionResult = { ok: true };
+
+    if (status === 'approved' && previous?.status !== 'approved' && isApplicantTable(tab.table)) {
+      // Approving a person must create their login and email them — never a bare status update.
+      result = await approveApplicant(tab.table, id, { admin_notes });
+    } else {
+      const { error } = await supabase.from(tab.table).update({ status, admin_notes }).eq('id', id);
+      if (error) result = { ok: false, message: 'Could not save this change. Please try again.' };
+    }
+
+    if (result.message) setNotice(result);
+    if (!result.ok) return false;
     setEntries((prev) => prev.map((e) => e.id === id ? { ...e, status, admin_notes } : e));
     fetchCounts();
+    return true;
   };
 
   const handleSignOut = async () => {
@@ -253,6 +269,22 @@ export default function AdminDashboard() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        {notice?.message && (
+          <div
+            role="status"
+            className={`sticky top-2 z-10 mb-4 flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm shadow-sm ${
+              !notice.ok ? 'bg-red-50 border-red-200 text-red-700'
+                : notice.warn ? 'bg-amber-50 border-amber-200 text-amber-800'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            }`}
+          >
+            <span>{notice.message}</span>
+            <button onClick={() => setNotice(null)} aria-label="Dismiss" className="text-xs font-semibold opacity-70 hover:opacity-100">
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Stats row */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-6">
           {TABS.map((tab) => {
