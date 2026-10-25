@@ -7,12 +7,11 @@ import {
   BadgeCheck, Inbox,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { approveApplicant, type DecisionResult } from '../../lib/approveApplicant';
 import AdminHeader from '../../components/AdminHeader';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
-
-type DecisionResult = { ok: boolean; message?: string; warn?: boolean };
 
 type MemberApplicant = {
   id: string;
@@ -331,29 +330,8 @@ export default function AdminApprovals() {
 
   useEffect(() => { fetchApplicants(); }, [fetchApplicants]);
 
-  // Approving runs the approve-applicant edge function (service role): it creates the
-  // member's login if needed and emails them a link to confirm and create a password.
-  // Other decisions are plain row updates.
-  const callApprove = async (
-    source: MemberApplicant['source'],
-    id: string,
-    extra: { resend?: boolean; admin_notes?: string },
-  ): Promise<DecisionResult> => {
-    const { data, error } = await supabase.functions.invoke('approve-applicant', {
-      body: { source, id, ...extra },
-    });
-    let payload: { error?: string; emailSent?: boolean; approved?: boolean } | null = data ?? null;
-    if (error) {
-      const ctx = (error as { context?: Response }).context;
-      try { payload = ctx ? await ctx.clone().json() : null; } catch { payload = null; }
-      if (payload?.approved) {
-        return { ok: true, warn: true, message: payload.error ?? 'Approved, but the email could not be sent. Use "Resend approval email".' };
-      }
-      return { ok: false, message: payload?.error ?? 'Could not approve this applicant. Please try again.' };
-    }
-    return { ok: true, message: extra.resend ? 'Approval email sent.' : 'Approved — an email with a link to create their password has been sent.' };
-  };
-
+  // Approving goes through the approve-applicant edge function (see lib/approveApplicant);
+  // other decisions are plain row updates.
   const handleDecision = async (
     id: string,
     source: MemberApplicant['source'],
@@ -363,7 +341,7 @@ export default function AdminApprovals() {
     const who = applicants.find((a) => a.id === id && a.source === source)?.name ?? 'Applicant';
     let result: DecisionResult;
     if (status === 'approved') {
-      result = await callApprove(source, id, { admin_notes });
+      result = await approveApplicant(source, id, { admin_notes });
     } else {
       const { error } = await supabase.from(source).update({ status, admin_notes }).eq('id', id);
       result = error ? { ok: false, message: 'Could not save this decision. Please try again.' } : { ok: true };
@@ -388,7 +366,7 @@ export default function AdminApprovals() {
 
   const handleResend = async (id: string, source: MemberApplicant['source']) => {
     const who = applicants.find((a) => a.id === id && a.source === source)?.name ?? 'Applicant';
-    const result = await callApprove(source, id, { resend: true });
+    const result = await approveApplicant(source, id, { resend: true });
     setNotice({ ...result, who });
   };
 
