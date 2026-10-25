@@ -125,6 +125,12 @@ export default function Login() {
                   {error}
                 </div>
               )}
+              {error && (
+                <p className="text-xs text-ink-500 leading-relaxed -mt-2">
+                  Just approved? Use the link in your approval email to create your password, or choose
+                  {' '}<strong>Forgot password?</strong> above to get a new one.
+                </p>
+              )}
 
               <button
                 type="submit"

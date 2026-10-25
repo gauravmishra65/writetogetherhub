@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CheckCircle, XCircle, Clock, RefreshCw, UserCheck,
-  MapPin, Mail, Phone, Pen, BookOpen as BookOpenIcon,
+  MapPin, Mail, Phone, Pen,
   MessageSquare, Users, ChevronDown, ChevronUp, Flag,
   BadgeCheck, Inbox,
 } from 'lucide-react';
@@ -11,6 +11,8 @@ import AdminHeader from '../../components/AdminHeader';
 import { useDocumentTitle } from '../../lib/useDocumentTitle';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'flagged';
+
+type DecisionResult = { ok: boolean; message?: string; warn?: boolean };
 
 type MemberApplicant = {
   id: string;
@@ -65,20 +67,29 @@ function ExperiencePip({ level }: { level: string | null | undefined }) {
 function ApplicantCard({
   applicant,
   onDecision,
+  onResend,
 }: {
   applicant: MemberApplicant;
-  onDecision: (id: string, source: MemberApplicant['source'], status: Status, notes: string) => Promise<void>;
+  onDecision: (id: string, source: MemberApplicant['source'], status: Status, notes: string) => Promise<DecisionResult>;
+  onResend: (id: string, source: MemberApplicant['source']) => Promise<void>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [notes, setNotes] = useState(applicant.admin_notes ?? '');
   const [localStatus, setLocalStatus] = useState<Status>(applicant.status);
   const [acting, setActing] = useState<Status | null>(null);
+  const [resending, setResending] = useState(false);
 
   const decide = async (newStatus: Status) => {
     setActing(newStatus);
-    await onDecision(applicant.id, applicant.source, newStatus, notes);
-    setLocalStatus(newStatus);
+    const result = await onDecision(applicant.id, applicant.source, newStatus, notes);
+    if (result.ok) setLocalStatus(newStatus);
     setActing(null);
+  };
+
+  const resend = async () => {
+    setResending(true);
+    await onResend(applicant.id, applicant.source);
+    setResending(false);
   };
 
   const isPending = localStatus === 'pending';
@@ -221,6 +232,16 @@ function ApplicantCard({
               <Flag className="w-3.5 h-3.5" />
               {acting === 'flagged' ? 'Flagging…' : 'Flag'}
             </button>
+            {localStatus === 'approved' && (
+              <button
+                onClick={resend}
+                disabled={!!acting || resending}
+                className="flex items-center gap-1.5 bg-white border border-emerald-300 hover:border-emerald-400 text-emerald-700 text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                {resending ? 'Sending…' : 'Resend approval email'}
+              </button>
+            )}
             {!isPending && (
               <button
                 onClick={() => decide('pending')}
@@ -278,6 +299,8 @@ export default function AdminApprovals() {
   const [adminEmail, setAdminEmail] = useState('');
   const [totalPending, setTotalPending] = useState(0);
   const [sourceFilter, setSourceFilter] = useState<'all' | MemberApplicant['source']>('all');
+  // Shown at page level because an approved card leaves the "Pending" list straight away.
+  const [notice, setNotice] = useState<(DecisionResult & { who: string }) | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -308,13 +331,46 @@ export default function AdminApprovals() {
 
   useEffect(() => { fetchApplicants(); }, [fetchApplicants]);
 
+  // Approving runs the approve-applicant edge function (service role): it creates the
+  // member's login if needed and emails them a link to confirm and create a password.
+  // Other decisions are plain row updates.
+  const callApprove = async (
+    source: MemberApplicant['source'],
+    id: string,
+    extra: { resend?: boolean; admin_notes?: string },
+  ): Promise<DecisionResult> => {
+    const { data, error } = await supabase.functions.invoke('approve-applicant', {
+      body: { source, id, ...extra },
+    });
+    let payload: { error?: string; emailSent?: boolean; approved?: boolean } | null = data ?? null;
+    if (error) {
+      const ctx = (error as { context?: Response }).context;
+      try { payload = ctx ? await ctx.clone().json() : null; } catch { payload = null; }
+      if (payload?.approved) {
+        return { ok: true, warn: true, message: payload.error ?? 'Approved, but the email could not be sent. Use "Resend approval email".' };
+      }
+      return { ok: false, message: payload?.error ?? 'Could not approve this applicant. Please try again.' };
+    }
+    return { ok: true, message: extra.resend ? 'Approval email sent.' : 'Approved — an email with a link to create their password has been sent.' };
+  };
+
   const handleDecision = async (
     id: string,
     source: MemberApplicant['source'],
     status: Status,
     admin_notes: string
-  ) => {
-    await supabase.from(source).update({ status, admin_notes }).eq('id', id);
+  ): Promise<DecisionResult> => {
+    const who = applicants.find((a) => a.id === id && a.source === source)?.name ?? 'Applicant';
+    let result: DecisionResult;
+    if (status === 'approved') {
+      result = await callApprove(source, id, { admin_notes });
+    } else {
+      const { error } = await supabase.from(source).update({ status, admin_notes }).eq('id', id);
+      result = error ? { ok: false, message: 'Could not save this decision. Please try again.' } : { ok: true };
+    }
+    if (result.message) setNotice({ ...result, who });
+    if (!result.ok) return result;
+
     setApplicants((prev) =>
       prev.map((a) => (a.id === id && a.source === source ? { ...a, status, admin_notes } : a))
     );
@@ -327,6 +383,13 @@ export default function AdminApprovals() {
       if (!wasP && isNowP) return prev + 1;
       return prev;
     });
+    return result;
+  };
+
+  const handleResend = async (id: string, source: MemberApplicant['source']) => {
+    const who = applicants.find((a) => a.id === id && a.source === source)?.name ?? 'Applicant';
+    const result = await callApprove(source, id, { resend: true });
+    setNotice({ ...result, who });
   };
 
   const handleSignOut = async () => {
@@ -384,6 +447,22 @@ export default function AdminApprovals() {
             <span className="hidden sm:block">Refresh</span>
           </button>
         </div>
+
+        {notice?.message && (
+          <div
+            role="status"
+            className={`sticky top-2 z-10 mb-4 flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm shadow-sm ${
+              !notice.ok ? 'bg-red-50 border-red-200 text-red-700'
+                : notice.warn ? 'bg-amber-50 border-amber-200 text-amber-800'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            }`}
+          >
+            <span><strong>{notice.who}:</strong> {notice.message}</span>
+            <button onClick={() => setNotice(null)} aria-label="Dismiss" className="text-xs font-semibold opacity-70 hover:opacity-100">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Summary cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
@@ -464,7 +543,7 @@ export default function AdminApprovals() {
         ) : (
           <div className="space-y-3">
             {filtered.map((a) => (
-              <ApplicantCard key={`${a.source}-${a.id}`} applicant={a} onDecision={handleDecision} />
+              <ApplicantCard key={`${a.source}-${a.id}`} applicant={a} onDecision={handleDecision} onResend={handleResend} />
             ))}
           </div>
         )}

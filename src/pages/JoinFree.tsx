@@ -146,9 +146,9 @@ export default function JoinFree() {
                   <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <CheckCircle className="w-8 h-8 text-sage-600" />
                   </div>
-                  <h3 className="font-serif font-bold text-2xl text-ink-900 mb-3">Welcome to the Community!</h3>
+                  <h3 className="font-serif font-bold text-2xl text-ink-900 mb-3">Request Received!</h3>
                   <p className="text-ink-600 leading-relaxed">
-                    Thank you for joining Write Together Hub. Check your email for a welcome message with everything you need to get started.
+                    Thank you for applying to join Write Together Hub. We review every request personally. Once you are approved, we will email you a link to confirm your address and create your password.
                   </p>
                   <p className="text-ink-500 text-sm mt-4">
                     While you wait, explore our{' '}
@@ -157,7 +157,7 @@ export default function JoinFree() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="card p-8 space-y-6">
-                  <h3 className="font-serif font-bold text-xl text-ink-900">Create Your Free Account</h3>
+                  <h3 className="font-serif font-bold text-xl text-ink-900">Request Your Free Membership</h3>
 
                   {error && (
                     <div className="flex items-center gap-2 text-red-700 bg-red-50 border border-red-100 rounded-lg p-3 text-sm">
