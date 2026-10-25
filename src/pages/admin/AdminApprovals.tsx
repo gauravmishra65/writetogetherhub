@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CheckCircle, XCircle, Clock, RefreshCw, UserCheck,
   MapPin, Mail, Phone, Pen,
   MessageSquare, Users, ChevronDown, ChevronUp, Flag,
-  BadgeCheck, Inbox,
+  BadgeCheck, Inbox, Send, KeyRound,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { approveApplicant, type DecisionResult } from '../../lib/approveApplicant';
@@ -31,7 +31,21 @@ type MemberApplicant = {
   status: Status;
   admin_notes: string | null;
   created_at: string;
+  user_id?: string | null;
+  /** True when this person already has a login (a registrations row linked to an auth user). */
+  hasLogin?: boolean;
 };
+
+const keyOf = (a: Pick<MemberApplicant, 'source' | 'id'>) => `${a.source}-${a.id}`;
+
+// Gentle pace so Resend's rate limit is never hit when sending to many people.
+const BULK_DELAY_MS = import.meta.env.MODE === 'test' ? 0 : 700;
+
+type BulkState =
+  | { stage: 'idle' }
+  | { stage: 'confirm' }
+  | { stage: 'running'; done: number; total: number }
+  | { stage: 'done'; sent: number; total: number; failed: { name: string; message: string }[] };
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -65,10 +79,14 @@ function ExperiencePip({ level }: { level: string | null | undefined }) {
 
 function ApplicantCard({
   applicant,
+  selected,
+  onToggleSelect,
   onDecision,
   onResend,
 }: {
   applicant: MemberApplicant;
+  selected: boolean;
+  onToggleSelect: () => void;
   onDecision: (id: string, source: MemberApplicant['source'], status: Status, notes: string) => Promise<DecisionResult>;
   onResend: (id: string, source: MemberApplicant['source']) => Promise<void>;
 }) {
@@ -122,6 +140,15 @@ function ApplicantCard({
 
       {/* Main row */}
       <div className="p-4 flex items-start gap-4">
+        {localStatus === 'approved' && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onToggleSelect}
+            aria-label={`Select ${applicant.name}`}
+            className="mt-3 h-4 w-4 flex-shrink-0 rounded border-parchment-300 accent-ember-600"
+          />
+        )}
         {/* Avatar initial */}
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ember-400 to-ember-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
           {applicant.name.charAt(0).toUpperCase()}
@@ -134,6 +161,12 @@ function ApplicantCard({
               {SOURCE_LABEL[applicant.source]}
             </span>
             <ExperiencePip level={applicant.experience_level} />
+            {localStatus === 'approved' && !applicant.hasLogin && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded border bg-amber-50 text-amber-800 border-amber-200">
+                <KeyRound className="w-3 h-3" />
+                No login yet
+              </span>
+            )}
           </div>
 
           <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-ink-500 mt-0.5">
@@ -238,7 +271,7 @@ function ApplicantCard({
                 className="flex items-center gap-1.5 bg-white border border-emerald-300 hover:border-emerald-400 text-emerald-700 text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
               >
                 <Mail className="w-3.5 h-3.5" />
-                {resending ? 'Sending…' : 'Resend approval email'}
+                {resending ? 'Sending…' : 'Send login email'}
               </button>
             )}
             {!isPending && (
@@ -252,6 +285,20 @@ function ApplicantCard({
               </button>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Quick action for approved members (collapsed state) */}
+      {!expanded && localStatus === 'approved' && (
+        <div className="px-4 pb-3 flex gap-2">
+          <button
+            onClick={resend}
+            disabled={resending}
+            className="flex items-center gap-1 bg-white hover:bg-emerald-50 border border-emerald-300 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+          >
+            <Mail className="w-3 h-3" />
+            {resending ? 'Sending…' : 'Send login email'}
+          </button>
         </div>
       )}
 
@@ -300,6 +347,10 @@ export default function AdminApprovals() {
   const [sourceFilter, setSourceFilter] = useState<'all' | MemberApplicant['source']>('all');
   // Shown at page level because an approved card leaves the "Pending" list straight away.
   const [notice, setNotice] = useState<(DecisionResult & { who: string }) | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [noLoginOnly, setNoLoginOnly] = useState(false);
+  const [bulk, setBulk] = useState<BulkState>({ stage: 'idle' });
+  const stopBulk = useRef(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -316,8 +367,22 @@ export default function AdminApprovals() {
       supabase.from('join_requests').select('*').order('created_at', { ascending: false }),
     ]);
 
-    const regs: MemberApplicant[] = (regResult.data ?? []).map((r) => ({ ...r, source: 'registrations' as const }));
-    const joins: MemberApplicant[] = (joinResult.data ?? []).map((j) => ({ ...j, source: 'join_requests' as const }));
+    // A person has a login when a registrations row is linked to an auth user.
+    const loginEmails = new Set(
+      (regResult.data ?? [])
+        .filter((r) => r.user_id)
+        .map((r) => String(r.email).trim().toLowerCase())
+    );
+    const regs: MemberApplicant[] = (regResult.data ?? []).map((r) => ({
+      ...r,
+      source: 'registrations' as const,
+      hasLogin: !!r.user_id,
+    }));
+    const joins: MemberApplicant[] = (joinResult.data ?? []).map((j) => ({
+      ...j,
+      source: 'join_requests' as const,
+      hasLogin: loginEmails.has(String(j.email).trim().toLowerCase()),
+    }));
 
     const combined = [...regs, ...joins].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -368,6 +433,42 @@ export default function AdminApprovals() {
     const who = applicants.find((a) => a.id === id && a.source === source)?.name ?? 'Applicant';
     const result = await approveApplicant(source, id, { resend: true });
     setNotice({ ...result, who });
+    if (result.ok) markHasLogin(id, source);
+  };
+
+  const markHasLogin = (id: string, source: MemberApplicant['source']) =>
+    setApplicants((prev) => prev.map((a) => (a.id === id && a.source === source ? { ...a, hasLogin: true } : a)));
+
+  const toggleSelect = (key: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+
+  // Send the login email to everyone selected, one at a time, and report what happened.
+  const sendToSelected = async () => {
+    const people = applicants.filter((a) => a.status === 'approved' && selected.has(keyOf(a)));
+    if (people.length === 0) { setBulk({ stage: 'idle' }); return; }
+    stopBulk.current = false;
+    const failed: { name: string; message: string }[] = [];
+    let sent = 0;
+    for (let i = 0; i < people.length; i++) {
+      if (stopBulk.current) break;
+      setBulk({ stage: 'running', done: i, total: people.length });
+      const person = people[i];
+      const result = await approveApplicant(person.source, person.id, { resend: true });
+      if (result.ok && !result.warn) {
+        sent += 1;
+        markHasLogin(person.id, person.source);
+        setSelected((prev) => { const next = new Set(prev); next.delete(keyOf(person)); return next; });
+      } else {
+        if (result.ok) markHasLogin(person.id, person.source);
+        failed.push({ name: person.name, message: result.message ?? 'Could not send.' });
+      }
+      if (i < people.length - 1 && BULK_DELAY_MS) await new Promise((r) => setTimeout(r, BULK_DELAY_MS));
+    }
+    setBulk({ stage: 'done', sent, total: people.length, failed });
   };
 
   const handleSignOut = async () => {
@@ -378,8 +479,12 @@ export default function AdminApprovals() {
   const filtered = applicants.filter((a) => {
     const matchStatus = filter === 'all' || a.status === filter;
     const matchSource = sourceFilter === 'all' || a.source === sourceFilter;
-    return matchStatus && matchSource;
+    const matchLogin = !noLoginOnly || (a.status === 'approved' && !a.hasLogin);
+    return matchStatus && matchSource && matchLogin;
   });
+  const noLoginCount = applicants.filter((a) => a.status === 'approved' && !a.hasLogin).length;
+  const shownApproved = filtered.filter((a) => a.status === 'approved');
+  const selectedCount = applicants.filter((a) => a.status === 'approved' && selected.has(keyOf(a))).length;
 
   const counts: Record<FilterTab, number> = {
     pending:  applicants.filter((a) => a.status === 'pending').length,
@@ -502,6 +607,93 @@ export default function AdminApprovals() {
           </div>
         </div>
 
+        {/* Send login emails */}
+        {(noLoginOnly || noLoginCount > 0 || shownApproved.length > 0) && bulk.stage !== 'running' && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-parchment-200 bg-white px-3 py-2.5">
+            <button
+              onClick={() => { setNoLoginOnly((v) => !v); setFilter('approved'); }}
+              aria-pressed={noLoginOnly}
+              className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                noLoginOnly ? 'bg-amber-50 border-amber-300 text-amber-800' : 'border-parchment-200 text-ink-600 hover:border-parchment-300'
+              }`}
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              No login yet ({noLoginCount})
+            </button>
+            {shownApproved.length > 0 && (
+              <>
+                <button
+                  onClick={() => setSelected(new Set(shownApproved.map(keyOf)))}
+                  className="rounded-md border border-parchment-200 px-3 py-1.5 text-xs font-semibold text-ink-600 hover:border-parchment-300"
+                >
+                  Select all shown ({shownApproved.length})
+                </button>
+                {selectedCount > 0 && (
+                  <button
+                    onClick={() => setSelected(new Set())}
+                    className="rounded-md px-2 py-1.5 text-xs font-semibold text-ink-500 hover:text-ink-800"
+                  >
+                    Clear
+                  </button>
+                )}
+              </>
+            )}
+            <button
+              onClick={() => setBulk({ stage: 'confirm' })}
+              disabled={selectedCount === 0}
+              className="ml-auto flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-40"
+            >
+              <Send className="w-3.5 h-3.5" />
+              Send login email to {selectedCount} selected
+            </button>
+          </div>
+        )}
+
+        {bulk.stage === 'confirm' && (
+          <div role="alertdialog" aria-label="Confirm sending login emails" className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="font-semibold">Send a login email to {selectedCount} {selectedCount === 1 ? 'person' : 'people'}?</p>
+            <ul className="mt-2 max-h-40 list-disc space-y-0.5 overflow-auto pl-5 text-xs">
+              {applicants.filter((a) => a.status === 'approved' && selected.has(keyOf(a))).slice(0, 20).map((a) => (
+                <li key={keyOf(a)}>{a.name} — {a.email}</li>
+              ))}
+              {selectedCount > 20 && <li>…and {selectedCount - 20} more</li>}
+            </ul>
+            <p className="mt-2 text-xs">
+              Each person gets an email with a link to create their password, and a login is created for anyone who does not have one.
+              Any earlier link sent to the same person stops working. This contacts real people.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button onClick={sendToSelected} className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700">
+                Send {selectedCount} {selectedCount === 1 ? 'email' : 'emails'}
+              </button>
+              <button onClick={() => setBulk({ stage: 'idle' })} className="rounded-lg border border-amber-300 bg-white px-4 py-2 text-xs font-semibold text-amber-900 hover:bg-amber-100">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {bulk.stage === 'running' && (
+          <div role="status" className="mb-4 flex items-center justify-between rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+            <span>Sending {Math.min(bulk.done + 1, bulk.total)} of {bulk.total}… please keep this page open.</span>
+            <button onClick={() => { stopBulk.current = true; }} className="text-xs font-semibold underline">Stop</button>
+          </div>
+        )}
+
+        {bulk.stage === 'done' && (
+          <div role="status" className={`mb-4 rounded-xl border px-4 py-3 text-sm ${bulk.failed.length ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>
+            <div className="flex items-start justify-between gap-3">
+              <span><strong>Sent {bulk.sent} of {bulk.total}.</strong>{bulk.failed.length > 0 && ` ${bulk.failed.length} had a problem:`}</span>
+              <button onClick={() => setBulk({ stage: 'idle' })} aria-label="Dismiss" className="text-xs font-semibold opacity-70 hover:opacity-100">Dismiss</button>
+            </div>
+            {bulk.failed.length > 0 && (
+              <ul className="mt-1 list-disc pl-5 text-xs">
+                {bulk.failed.map((f, i) => <li key={i}>{f.name}: {f.message}</li>)}
+              </ul>
+            )}
+          </div>
+        )}
+
         {/* List */}
         {loading ? (
           <div className="flex items-center justify-center py-24 text-ink-400">
@@ -521,7 +713,14 @@ export default function AdminApprovals() {
         ) : (
           <div className="space-y-3">
             {filtered.map((a) => (
-              <ApplicantCard key={`${a.source}-${a.id}`} applicant={a} onDecision={handleDecision} onResend={handleResend} />
+              <ApplicantCard
+                key={keyOf(a)}
+                applicant={a}
+                selected={selected.has(keyOf(a))}
+                onToggleSelect={() => toggleSelect(keyOf(a))}
+                onDecision={handleDecision}
+                onResend={handleResend}
+              />
             ))}
           </div>
         )}

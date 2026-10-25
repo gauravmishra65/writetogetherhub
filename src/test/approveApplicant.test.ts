@@ -16,6 +16,7 @@ const createUser = vi.fn();
 const generateLink = vi.fn();
 const resendFetch = vi.fn();
 
+const ACTION_LINK = 'https://proj.supabase.co/auth/v1/verify?token=abc123&type=recovery&redirect_to=https://writetogetherhub.com/reset-password';
 const ADMIN_ID = 'admin-1';
 const TOKENS: Record<string, string> = { 'admin-token': ADMIN_ID, 'member-token': 'member-1' };
 
@@ -119,7 +120,7 @@ beforeEach(() => {
     db.registrations.push({ id: 'reg-new', user_id: user.id, email, name: user_metadata.name, status: 'pending', role: 'member' });
     return { data: { user }, error: null };
   });
-  generateLink.mockResolvedValue({ data: { properties: { hashed_token: 'hash/with+chars' } }, error: null });
+  generateLink.mockResolvedValue({ data: { properties: { action_link: ACTION_LINK } }, error: null });
 });
 
 describe('approve-applicant access control', () => {
@@ -155,7 +156,11 @@ describe('approve-applicant for a join request (no account yet)', () => {
       email_confirm: true,
       user_metadata: { name: 'Asha Verma', invited_by_admin: true },
     });
-    expect(generateLink).toHaveBeenCalledWith({ type: 'recovery', email: 'asha@example.com' });
+    expect(generateLink).toHaveBeenCalledWith({
+      type: 'recovery',
+      email: 'asha@example.com',
+      options: { redirectTo: 'https://writetogetherhub.com/reset-password' },
+    });
 
     expect(db.join_requests[0].status).toBe('approved');
     const reg = db.registrations[0];
@@ -165,7 +170,8 @@ describe('approve-applicant for a join request (no account yet)', () => {
     const mail = sentEmail();
     expect(mail.to).toEqual(['asha@example.com']);
     expect(mail.subject).toMatch(/confirm your email and create your password/i);
-    expect(mail.html).toContain('https://writetogetherhub.com/reset-password?token_hash=hash%2Fwith%2Bchars&type=recovery');
+    // The link is HTML-escaped inside the email (& becomes &amp;).
+    expect(mail.html).toContain('https://proj.supabase.co/auth/v1/verify?token=abc123&amp;type=recovery');
     expect(mail.html).toContain('Hi Asha');
   });
 
@@ -206,7 +212,7 @@ describe('approve-applicant for a join request (no account yet)', () => {
     const res = await call({ source: 'join_requests', id: JOIN_ID, resend: true });
     expect(await res.json()).toMatchObject({ kind: 'signed_up' });
     expect(generateLink).not.toHaveBeenCalled();
-    expect(sentEmail().html).not.toContain('token_hash');
+    expect(sentEmail().html).not.toContain('/auth/v1/verify');
   });
 
   it('reports approval but a failed email so the admin can resend', async () => {
@@ -243,6 +249,6 @@ describe('approve-applicant for a registration (member chose a password at sign-
     const mail = sentEmail();
     expect(mail.to).toEqual(['ravi@example.com']);
     expect(mail.html).toContain('https://writetogetherhub.com/login');
-    expect(mail.html).not.toContain('token_hash');
+    expect(mail.html).not.toContain('/auth/v1/verify');
   });
 });
