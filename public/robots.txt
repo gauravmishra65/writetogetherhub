@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /member
+Disallow: /reset-password
+
+Sitemap: https://writetogetherhub.com/sitemap.xml
