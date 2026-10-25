@@ -13,9 +13,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  *     and emails a "you're approved, sign in" message.
  * `resend: true` re-issues the email for someone who is already approved.
  *
- * The link points at our own /reset-password page with a token_hash, so it does
- * not depend on the Supabase redirect allow-list and email scanners that only
- * GET the URL cannot consume the token (it is verified client-side).
+ * The link is Supabase's one-time recovery link (action_link). It signs the member in and
+ * lands them on /reset-password, which works with both the old and the new password page.
  */
 
 const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://writetogetherhub.com").replace(/\/+$/, "");
@@ -87,8 +86,8 @@ function buildEmail(kind: EmailKind, name: string, url: string): { subject: stri
     <div style="padding:32px 36px;color:#2c1810;font-size:16px;line-height:1.7;">
       <p style="margin:0 0 16px;">Hi ${firstName},</p>
       <p style="margin:0 0 24px;">${intro}</p>
-      <p style="margin:0 0 8px;"><a href="${url}" style="display:inline-block;background:#c0392b;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:8px;">${button}</a></p>
-      <p style="margin:16px 0 0;font-size:13px;color:#8a7a6a;word-break:break-all;">Button not working? Paste this link into your browser:<br>${url}</p>
+      <p style="margin:0 0 8px;"><a href="${esc(url)}" style="display:inline-block;background:#c0392b;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:8px;">${button}</a></p>
+      <p style="margin:16px 0 0;font-size:13px;color:#8a7a6a;word-break:break-all;">Button not working? Paste this link into your browser:<br>${esc(url)}</p>
       ${note}
       <p style="margin:24px 0 0;">Please take a minute to read our <a href="${SITE_URL}/community-rules" style="color:#c0392b;">Community Rules</a> — kindness first, always.</p>
       <p style="margin:24px 0 0;">Warmly,<br>The Write Together Hub team</p>
@@ -253,14 +252,21 @@ Deno.serve(async (req: Request) => {
   let kind: EmailKind;
   let link: string;
   if (needsPassword) {
-    const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({ type: "recovery", email });
-    const hashed = linkData?.properties?.hashed_token;
-    if (linkErr || !hashed) {
+    // Supabase's own one-time link: it signs the member in and sends them to /reset-password
+    // (the redirect must be on the project's allow-list, which writetogetherhub.com is).
+    // This works with the password page that is live today as well as the newer one.
+    const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: { redirectTo: `${SITE_URL}/reset-password` },
+    });
+    const actionLink = linkData?.properties?.action_link;
+    if (linkErr || !actionLink) {
       console.error("approve-applicant: generateLink failed", linkErr);
       return json(req, 502, { ok: true, approved: true, emailSent: false, error: "Approved, but the password link could not be created. Use Resend." });
     }
     kind = "set_password";
-    link = `${SITE_URL}/reset-password?token_hash=${encodeURIComponent(hashed)}&type=recovery`;
+    link = actionLink;
   } else {
     kind = "signed_up";
     link = `${SITE_URL}/login`;
