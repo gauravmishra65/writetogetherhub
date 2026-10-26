@@ -32,6 +32,7 @@ const routes = [
   'admin/login',
   'admin/approvals',
   'admin/members',
+  'admin/logins',
   'admin/testimonials',
 ];
 

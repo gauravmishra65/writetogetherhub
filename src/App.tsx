@@ -21,6 +21,8 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApprovals from './pages/admin/AdminApprovals';
 import AdminMembers from './pages/admin/AdminMembers';
+import AdminLogins from './pages/admin/AdminLogins';
+import NotFound from './pages/NotFound';
 import AdminTestimonials from './pages/admin/AdminTestimonials';
 
 export default function App() {
@@ -44,6 +46,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/member" element={<MemberArea />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
@@ -67,6 +70,14 @@ export default function App() {
           element={
             <AdminRoute>
               <AdminMembers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/logins"
+          element={
+            <AdminRoute>
+              <AdminLogins />
             </AdminRoute>
           }
         />
